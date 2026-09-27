@@ -1,0 +1,576 @@
+package com.example.airesearchassistant.controller;
+
+import com.example.airesearchassistant.model.AppSettings;
+import com.example.airesearchassistant.model.ResearchPaper;
+import com.example.airesearchassistant.service.ExportService;
+import com.example.airesearchassistant.service.OllamaException;
+import com.example.airesearchassistant.service.OllamaService;
+import com.example.airesearchassistant.service.OllamaService.ChatMessage;
+import com.example.airesearchassistant.service.PaperService;
+import com.example.airesearchassistant.service.SettingsService;
+import com.example.airesearchassistant.util.AlertUtil;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+
+import java.io.File;
+import java.sql.SQLException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * AssistantController — AI Research Assistant interface for local LLM inference.
+ * Features structured 7-section summarization, information extraction, context-aware Q&A chat,
+ * topic classification, background Task execution with cancel support, and offline instructions banner.
+ */
+public class AssistantController {
+
+    // Offline Banner
+    @FXML private HBox offlineBanner;
+
+    // Left Panel: Paper Selection & Action Buttons
+    @FXML private ComboBox<ResearchPaper> paperComboBox;
+    @FXML private Button summarizeButton;
+    @FXML private Button extractButton;
+    @FXML private Button classifyButton;
+
+    // Progress & Cancel Controls
+    @FXML private HBox progressBox;
+    @FXML private ProgressIndicator aiProgressIndicator;
+    @FXML private Label progressStatusLabel;
+    @FXML private Button cancelTaskButton;
+
+    // Right Panel: Analysis TabPane
+    @FXML private TabPane analysisTabPane;
+    @FXML private Tab summaryTab;
+    @FXML private Tab extractedTab;
+    @FXML private Tab qaTab;
+
+    // Tab 1: Summary Tab Controls
+    @FXML private TextArea summaryTextArea;
+    @FXML private Button copySummaryButton;
+    @FXML private Button saveSummaryButton;
+    @FXML private Label summaryStatusLabel;
+
+    // Tab 2: Extracted Information Tab Controls
+    @FXML private TextArea extractedAbstractArea;
+    @FXML private TextArea extractedMethodologyArea;
+    @FXML private TextArea extractedFindingsArea;
+    @FXML private TextField extractedKeywordsField;
+    @FXML private TextField extractedTopicField;
+    @FXML private TextArea extractedContributionsArea;
+    @FXML private TextArea extractedLimitationsArea;
+    @FXML private Button saveExtractedButton;
+    @FXML private Label extractedStatusLabel;
+
+    // Tab 3: Q&A Chat Tab Controls
+    @FXML private ListView<String> chatListView;
+    @FXML private TextField chatInputField;
+    @FXML private Button sendChatButton;
+
+    private final PaperService paperService = new PaperService();
+    private final SettingsService settingsService = new SettingsService();
+    private final ExportService exportService = new ExportService();
+    private final ObservableList<String> chatHistory = FXCollections.observableArrayList();
+    private final List<ChatMessage> conversationMessages = new ArrayList<>();
+
+    private Task<?> activeAiTask;
+
+    @FXML
+    public void initialize() {
+        if (progressBox != null) progressBox.setVisible(false);
+        if (chatListView != null) chatListView.setItems(chatHistory);
+
+        loadPapersIntoDropdown();
+        checkOllamaConnectionAsync();
+    }
+
+    private void loadPapersIntoDropdown() {
+        List<ResearchPaper> papers = paperService.getAllPapers();
+        if (paperComboBox != null) {
+            paperComboBox.getItems().setAll(papers);
+            if (!papers.isEmpty()) {
+                paperComboBox.setValue(papers.get(0));
+            }
+        }
+    }
+
+    private void checkOllamaConnectionAsync() {
+        AppSettings settings = settingsService.getSettings();
+        Task<Boolean> checkTask = new Task<>() {
+            @Override
+            protected Boolean call() {
+                return settingsService.testOllamaConnection(settings.getOllamaUrl());
+            }
+        };
+
+        checkTask.setOnSucceeded(e -> {
+            boolean online = checkTask.getValue();
+            if (offlineBanner != null) {
+                offlineBanner.setVisible(!online);
+                offlineBanner.setManaged(!online);
+            }
+        });
+
+        checkTask.setOnFailed(e -> {
+            if (offlineBanner != null) {
+                offlineBanner.setVisible(true);
+                offlineBanner.setManaged(true);
+            }
+        });
+
+        Thread thread = new Thread(checkTask, "OllamaHealthCheckWorker");
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    // ----- Left Action 1: Summarize Paper ------------------------------------
+
+    @FXML
+    private void handleSummarize() {
+        ResearchPaper paper = getSelectedPaper();
+        if (paper == null) return;
+
+        AppSettings settings = settingsService.getSettings();
+        OllamaService ollama = settingsService.getOllamaService();
+
+        showProgress("Generating 7-section paper summary using " + settings.getDefaultModel() + "...");
+
+        Task<String> task = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                return paperService.summarizePaper(
+                        paper, ollama, settings.getDefaultModel(),
+                        settings.getTemperature(), settings.getMaxTokens(),
+                        Duration.ofSeconds(settings.getTimeoutSeconds())
+                );
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            hideProgress();
+            String summary = task.getValue();
+            if (summaryTextArea != null) {
+                summaryTextArea.setText(summary);
+            }
+            if (summaryStatusLabel != null) {
+                summaryStatusLabel.setText("Summary generated successfully. Ready to save.");
+            }
+            if (analysisTabPane != null && summaryTab != null) {
+                analysisTabPane.getSelectionModel().select(summaryTab);
+            }
+        });
+
+        task.setOnFailed(e -> handleTaskFailure(task.getException(), "Summarization Failed"));
+
+        startAiTask(task);
+    }
+
+    // ----- Left Action 2: Extract Information --------------------------------
+
+    @FXML
+    private void handleExtractInfo() {
+        ResearchPaper paper = getSelectedPaper();
+        if (paper == null) return;
+
+        AppSettings settings = settingsService.getSettings();
+        OllamaService ollama = settingsService.getOllamaService();
+
+        showProgress("Extracting methodology, findings, and metadata using " + settings.getDefaultModel() + "...");
+
+        Task<String> task = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                return paperService.extractPaperInfo(
+                        paper, ollama, settings.getDefaultModel(),
+                        settings.getTemperature(), settings.getMaxTokens(),
+                        Duration.ofSeconds(settings.getTimeoutSeconds())
+                );
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            hideProgress();
+            String rawExtraction = task.getValue();
+            parseAndPopulateExtractedFields(rawExtraction);
+
+            if (extractedStatusLabel != null) {
+                extractedStatusLabel.setText("Information extracted. You can review/edit before saving.");
+            }
+            if (analysisTabPane != null && extractedTab != null) {
+                analysisTabPane.getSelectionModel().select(extractedTab);
+            }
+        });
+
+        task.setOnFailed(e -> handleTaskFailure(task.getException(), "Information Extraction Failed"));
+
+        startAiTask(task);
+    }
+
+    private void parseAndPopulateExtractedFields(String text) {
+        if (text == null) return;
+        String[] lines = text.split("\\r?\\n");
+
+        StringBuilder currentSection = new StringBuilder();
+        String currentKey = "";
+
+        for (String line : lines) {
+            String lower = line.toLowerCase().trim();
+            if (lower.startsWith("abstract:") || lower.startsWith("(1) abstract:")) {
+                saveCurrentSection(currentKey, currentSection.toString());
+                currentKey = "abstract";
+                currentSection = new StringBuilder(line.substring(line.indexOf(":") + 1).trim());
+            } else if (lower.startsWith("methodology:") || lower.startsWith("(2) methodology:")) {
+                saveCurrentSection(currentKey, currentSection.toString());
+                currentKey = "methodology";
+                currentSection = new StringBuilder(line.substring(line.indexOf(":") + 1).trim());
+            } else if (lower.startsWith("main findings:") || lower.startsWith("findings:") || lower.startsWith("(3) main findings:")) {
+                saveCurrentSection(currentKey, currentSection.toString());
+                currentKey = "findings";
+                currentSection = new StringBuilder(line.substring(line.indexOf(":") + 1).trim());
+            } else if (lower.startsWith("keywords:") || lower.startsWith("(4) keywords:")) {
+                saveCurrentSection(currentKey, currentSection.toString());
+                currentKey = "keywords";
+                currentSection = new StringBuilder(line.substring(line.indexOf(":") + 1).trim());
+            } else if (lower.startsWith("research topic:") || lower.startsWith("topic:") || lower.startsWith("(5) research topic:")) {
+                saveCurrentSection(currentKey, currentSection.toString());
+                currentKey = "topic";
+                currentSection = new StringBuilder(line.substring(line.indexOf(":") + 1).trim());
+            } else if (lower.startsWith("contributions:") || lower.startsWith("(6) contributions:")) {
+                saveCurrentSection(currentKey, currentSection.toString());
+                currentKey = "contributions";
+                currentSection = new StringBuilder(line.substring(line.indexOf(":") + 1).trim());
+            } else if (lower.startsWith("limitations:") || lower.startsWith("(7) limitations:")) {
+                saveCurrentSection(currentKey, currentSection.toString());
+                currentKey = "limitations";
+                currentSection = new StringBuilder(line.substring(line.indexOf(":") + 1).trim());
+            } else {
+                if (!currentKey.isEmpty()) {
+                    currentSection.append("\n").append(line);
+                }
+            }
+        }
+        saveCurrentSection(currentKey, currentSection.toString());
+
+        // If no sections recognized, populate raw in methodology area
+        if (currentKey.isEmpty() && extractedMethodologyArea != null) {
+            extractedMethodologyArea.setText(text);
+        }
+    }
+
+    private void saveCurrentSection(String key, String content) {
+        String val = content.trim();
+        switch (key) {
+            case "abstract" -> { if (extractedAbstractArea != null) extractedAbstractArea.setText(val); }
+            case "methodology" -> { if (extractedMethodologyArea != null) extractedMethodologyArea.setText(val); }
+            case "findings" -> { if (extractedFindingsArea != null) extractedFindingsArea.setText(val); }
+            case "keywords" -> { if (extractedKeywordsField != null) extractedKeywordsField.setText(val); }
+            case "topic" -> { if (extractedTopicField != null) extractedTopicField.setText(val); }
+            case "contributions" -> { if (extractedContributionsArea != null) extractedContributionsArea.setText(val); }
+            case "limitations" -> { if (extractedLimitationsArea != null) extractedLimitationsArea.setText(val); }
+        }
+    }
+
+    // ----- Left Action 3: Classify Topic -------------------------------------
+
+    @FXML
+    private void handleClassifyTopic() {
+        ResearchPaper paper = getSelectedPaper();
+        if (paper == null) return;
+
+        AppSettings settings = settingsService.getSettings();
+        OllamaService ollama = settingsService.getOllamaService();
+        List<String> topics = paperService.getAvailableTopics();
+
+        showProgress("Classifying research topic using " + settings.getDefaultModel() + "...");
+
+        Task<String> task = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                return paperService.classifyPaperTopic(paper, topics, ollama, settings.getDefaultModel(), Duration.ofSeconds(settings.getTimeoutSeconds()));
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            hideProgress();
+            String classifiedTopic = task.getValue();
+            paper.setTopic(classifiedTopic);
+            try {
+                paperService.updatePaper(paper);
+                if (extractedTopicField != null) extractedTopicField.setText(classifiedTopic);
+                AlertUtil.showInfo("Topic Classified", "Classification Complete",
+                        "Paper \"" + paper.getTitle() + "\" has been classified as:\n\n" + classifiedTopic);
+            } catch (SQLException ex) {
+                AlertUtil.showError("Database Error", "Failed to update paper topic", ex.getMessage());
+            }
+        });
+
+        task.setOnFailed(e -> handleTaskFailure(task.getException(), "Classification Failed"));
+
+        startAiTask(task);
+    }
+
+    // ----- Tab 1 Actions: Copy & Save Summary --------------------------------
+
+    @FXML
+    private void handleCopySummary() {
+        if (summaryTextArea != null && !summaryTextArea.getText().isEmpty()) {
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            ClipboardContent content = new ClipboardContent();
+            content.putString(summaryTextArea.getText());
+            clipboard.setContent(content);
+            if (summaryStatusLabel != null) {
+                summaryStatusLabel.setText("✓ Summary copied to system clipboard!");
+            }
+        }
+    }
+
+    @FXML
+    private void handleSaveSummary() {
+        ResearchPaper paper = getSelectedPaper();
+        if (paper == null || summaryTextArea == null || summaryTextArea.getText().trim().isEmpty()) {
+            AlertUtil.showWarning("Missing Summary", "No Summary Content", "Please generate a summary before saving.");
+            return;
+        }
+
+        try {
+            paperService.saveAiSummary(paper.getId(), summaryTextArea.getText().trim());
+            paper.setAiSummary(summaryTextArea.getText().trim());
+            if (summaryStatusLabel != null) {
+                summaryStatusLabel.setText("✓ AI Summary saved to paper record and marked as analyzed.");
+            }
+            AlertUtil.showInfo("Summary Saved", "Record Updated", "AI Summary has been attached to paper record.");
+        } catch (SQLException e) {
+            AlertUtil.showError("Database Error", "Failed to save AI summary", e.getMessage());
+        }
+    }
+
+    // ----- Tab 2 Actions: Save Extracted Fields ------------------------------
+
+    @FXML
+    private void handleSaveExtracted() {
+        ResearchPaper paper = getSelectedPaper();
+        if (paper == null) return;
+
+        if (extractedAbstractArea != null && !extractedAbstractArea.getText().trim().isEmpty()) {
+            paper.setAbstractText(extractedAbstractArea.getText().trim());
+        }
+        if (extractedMethodologyArea != null && !extractedMethodologyArea.getText().trim().isEmpty()) {
+            paper.setMethodology(extractedMethodologyArea.getText().trim());
+        }
+        if (extractedFindingsArea != null && !extractedFindingsArea.getText().trim().isEmpty()) {
+            paper.setFindings(extractedFindingsArea.getText().trim());
+        }
+        if (extractedKeywordsField != null && !extractedKeywordsField.getText().trim().isEmpty()) {
+            paper.setKeywords(extractedKeywordsField.getText().trim());
+        }
+        if (extractedTopicField != null && !extractedTopicField.getText().trim().isEmpty()) {
+            paper.setTopic(extractedTopicField.getText().trim());
+        }
+
+        try {
+            paperService.updatePaper(paper);
+            if (extractedStatusLabel != null) {
+                extractedStatusLabel.setText("✓ Extracted fields updated in database!");
+            }
+            AlertUtil.showInfo("Paper Updated", "Success", "Extracted metadata saved to paper record.");
+        } catch (SQLException e) {
+            AlertUtil.showError("Database Error", "Failed to save extracted information", e.getMessage());
+        }
+    }
+
+    // ----- Tab 3 Actions: Context-Aware Q&A ----------------------------------
+
+    @FXML
+    private void handleSendChat() {
+        ResearchPaper paper = getSelectedPaper();
+        if (paper == null) {
+            AlertUtil.showWarning("Selection Required", "No Paper Selected", "Please select a paper from the dropdown first.");
+            return;
+        }
+
+        String question = chatInputField != null ? chatInputField.getText().trim() : "";
+        if (question.isEmpty()) return;
+
+        chatInputField.clear();
+        chatHistory.add("You: " + question);
+
+        AppSettings settings = settingsService.getSettings();
+        OllamaService ollama = settingsService.getOllamaService();
+
+        showProgress("Consulting Ollama (" + settings.getDefaultModel() + ")...");
+
+        Task<String> task = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                return paperService.askPaperQuestion(
+                        paper, question, conversationMessages, ollama,
+                        settings.getDefaultModel(), settings.getTemperature(), settings.getMaxTokens(),
+                        Duration.ofSeconds(settings.getTimeoutSeconds())
+                );
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            hideProgress();
+            String answer = task.getValue();
+            chatHistory.add("Assistant: " + answer);
+            conversationMessages.add(new ChatMessage("user", question));
+            conversationMessages.add(new ChatMessage("assistant", answer));
+            if (chatListView != null) {
+                chatListView.scrollTo(chatHistory.size() - 1);
+            }
+        });
+
+        task.setOnFailed(e -> handleTaskFailure(task.getException(), "Q&A Request Failed"));
+
+        startAiTask(task);
+    }
+
+    // ----- Task Management Helpers ------------------------------------------
+
+    private void startAiTask(Task<?> task) {
+        this.activeAiTask = task;
+        Thread thread = new Thread(task, "OllamaInferenceWorker");
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    @FXML
+    private void handleCancelTask() {
+        if (activeAiTask != null && activeAiTask.isRunning()) {
+            activeAiTask.cancel();
+            hideProgress();
+            AlertUtil.showInfo("Operation Cancelled", "Inference Aborted", "The background AI task was cancelled.");
+        }
+    }
+
+    private void showProgress(String message) {
+        if (progressBox != null) progressBox.setVisible(true);
+        if (progressStatusLabel != null) progressStatusLabel.setText(message);
+        setButtonsDisabled(true);
+    }
+
+    private void hideProgress() {
+        if (progressBox != null) progressBox.setVisible(false);
+        setButtonsDisabled(false);
+        activeAiTask = null;
+    }
+
+    private void setButtonsDisabled(boolean disabled) {
+        if (summarizeButton != null) summarizeButton.setDisable(disabled);
+        if (extractButton != null) extractButton.setDisable(disabled);
+        if (classifyButton != null) classifyButton.setDisable(disabled);
+        if (sendChatButton != null) sendChatButton.setDisable(disabled);
+    }
+
+    private void handleTaskFailure(Throwable ex, String title) {
+        hideProgress();
+        String message = (ex instanceof OllamaException)
+                ? ex.getMessage()
+                : (ex != null && ex.getMessage() != null)
+                ? ex.getMessage()
+                : "An error occurred while communicating with Ollama.";
+
+        // If offline, ensure banner is displayed
+        if (offlineBanner != null) {
+            offlineBanner.setVisible(true);
+            offlineBanner.setManaged(true);
+        }
+
+        AlertUtil.showError(title, "Local AI Execution Error", message);
+    }
+
+    private ResearchPaper getSelectedPaper() {
+        if (paperComboBox == null || paperComboBox.getValue() == null) {
+            AlertUtil.showWarning("Paper Selection Required", "No Paper Selected",
+                    "Please select a research paper from the dropdown before requesting analysis.");
+            return null;
+        }
+        return paperComboBox.getValue();
+    }
+
+    @FXML
+    private void handleExport() {
+        ResearchPaper paper = paperComboBox != null ? paperComboBox.getValue() : null;
+        String title = (paper != null) ? paper.getTitle() : "AI_Assistant_Output";
+
+        String exportContent = "";
+        Tab selectedTab = analysisTabPane != null ? analysisTabPane.getSelectionModel().getSelectedItem() : null;
+
+        if (selectedTab == summaryTab || (selectedTab != null && "📑 7-Section Summary".equals(selectedTab.getText()))) {
+            exportContent = summaryTextArea != null ? summaryTextArea.getText() : "";
+        } else if (selectedTab == extractedTab || (selectedTab != null && "🔍 Extracted Info".equals(selectedTab.getText()))) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Extracted Information for: ").append(title).append("\n\n");
+            if (extractedAbstractArea != null && !extractedAbstractArea.getText().isBlank()) {
+                sb.append("Abstract:\n").append(extractedAbstractArea.getText()).append("\n\n");
+            }
+            if (extractedMethodologyArea != null && !extractedMethodologyArea.getText().isBlank()) {
+                sb.append("Methodology:\n").append(extractedMethodologyArea.getText()).append("\n\n");
+            }
+            if (extractedFindingsArea != null && !extractedFindingsArea.getText().isBlank()) {
+                sb.append("Findings:\n").append(extractedFindingsArea.getText()).append("\n\n");
+            }
+            if (extractedKeywordsField != null && !extractedKeywordsField.getText().isBlank()) {
+                sb.append("Keywords: ").append(extractedKeywordsField.getText()).append("\n\n");
+            }
+            if (extractedTopicField != null && !extractedTopicField.getText().isBlank()) {
+                sb.append("Topic: ").append(extractedTopicField.getText()).append("\n\n");
+            }
+            if (extractedContributionsArea != null && !extractedContributionsArea.getText().isBlank()) {
+                sb.append("Contributions:\n").append(extractedContributionsArea.getText()).append("\n\n");
+            }
+            if (extractedLimitationsArea != null && !extractedLimitationsArea.getText().isBlank()) {
+                sb.append("Limitations:\n").append(extractedLimitationsArea.getText()).append("\n\n");
+            }
+            exportContent = sb.toString();
+        } else if (selectedTab == qaTab || (selectedTab != null && selectedTab.getText().contains("Q&A"))) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Q&A Chat History for: ").append(title).append("\n\n");
+            if (conversationMessages != null) {
+                for (ChatMessage msg : conversationMessages) {
+                    sb.append(msg.role().toUpperCase()).append(":\n").append(msg.content()).append("\n\n");
+                }
+            }
+            exportContent = sb.toString();
+        }
+
+        if (exportContent == null || exportContent.trim().isEmpty()) {
+            AlertUtil.showWarning("Nothing to Export", "No Content Available",
+                    "The active tab has no content to export. Run an analysis or chat first.");
+            return;
+        }
+
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Export AI Assistant Output");
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Markdown (*.md)", "*.md"),
+                new FileChooser.ExtensionFilter("Plain Text (*.txt)", "*.txt")
+        );
+        String safeName = title.replaceAll("[^a-zA-Z0-9_-]", "_");
+        if (safeName.length() > 30) safeName = safeName.substring(0, 30);
+        chooser.setInitialFileName("ai_analysis_" + safeName);
+
+        File file = chooser.showSaveDialog(null);
+        if (file == null) return;
+
+        boolean asMarkdown = file.getName().endsWith(".md");
+        try {
+            exportService.exportTextContent(exportContent, "AI Analysis - " + title, file.toPath(), asMarkdown);
+            AlertUtil.showInfo("Export Successful", "File Saved",
+                    "Output successfully exported to:\n" + file.getAbsolutePath());
+        } catch (Exception ex) {
+            AlertUtil.showError("Export Failed", "Could not write file", ex.getMessage());
+        }
+    }
+}
