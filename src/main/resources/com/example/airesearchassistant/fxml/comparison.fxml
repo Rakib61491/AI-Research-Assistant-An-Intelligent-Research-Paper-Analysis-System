@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.airesearchassistant.controller.ComparisonController"
+            fitToWidth="true"
+            styleClass="page-scroll">
+
+    <VBox spacing="20" styleClass="page-container">
+
+        <!-- Header -->
+        <VBox spacing="4">
+            <Label text="Research Paper Comparison" styleClass="page-headline" />
+            <Label fx:id="statusLabel" text="Select two papers to compare." styleClass="muted-text" />
+        </VBox>
+
+        <!-- Paper Selection Row -->
+        <HBox spacing="16">
+            <VBox spacing="6" HBox.hgrow="ALWAYS" styleClass="card-section">
+                <Label text="Paper A" styleClass="form-label" />
+                <ComboBox fx:id="paperAComboBox" maxWidth="Infinity" styleClass="filter-combo"
+                          promptText="Select Paper A…" />
+            </VBox>
+            <VBox spacing="6" HBox.hgrow="ALWAYS" styleClass="card-section">
+                <Label text="Paper B" styleClass="form-label" />
+                <ComboBox fx:id="paperBComboBox" maxWidth="Infinity" styleClass="filter-combo"
+                          promptText="Select Paper B…" />
+            </VBox>
+        </HBox>
+
+        <!-- Action Buttons -->
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Button fx:id="localSimilarityBtn" text="📊 Compute Local Similarity"
+                    onAction="#handleLocalSimilarity" styleClass="primary-btn" />
+            <Button fx:id="aiCompareBtn" text="🤖 Compare with AI"
+                    onAction="#handleAiComparison" styleClass="secondary-btn" />
+            <Button text="💾 Export" onAction="#handleExport" styleClass="secondary-btn" />
+        </HBox>
+
+        <!-- Local Similarity Panel -->
+        <VBox fx:id="localSimilarityPane" spacing="10" styleClass="card-section">
+            <Label text="📊 Local Lexical Similarity" styleClass="section-header" />
+            <HBox spacing="16" alignment="CENTER_LEFT">
+                <Label fx:id="similarityScoreLabel" text="—" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #89b4fa;" />
+                <Label text="cosine similarity" styleClass="muted-text" style="-fx-font-size: 13px;" />
+            </HBox>
+            <Label fx:id="disclaimerLabel"
+                   text="⚠ Lexical similarity measure only — NOT proof of plagiarism or identical contributions."
+                   styleClass="muted-text"
+                   wrapText="true"
+                   style="-fx-font-style: italic; -fx-text-fill: #f9e2af;" />
+            <HBox spacing="16">
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label text="Shared Key Terms" styleClass="form-label" />
+                    <TextArea fx:id="sharedTermsArea" editable="false" wrapText="true"
+                              prefRowCount="3" styleClass="form-input"
+                              promptText="Shared terms will appear here…" />
+                </VBox>
+            </HBox>
+            <HBox spacing="16">
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label fx:id="distinctiveALabel" text="Distinctive to Paper A" styleClass="form-label" />
+                    <TextArea fx:id="distinctiveAArea" editable="false" wrapText="true"
+                              prefRowCount="2" styleClass="form-input"
+                              promptText="Distinctive terms for Paper A…" />
+                </VBox>
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label fx:id="distinctiveBLabel" text="Distinctive to Paper B" styleClass="form-label" />
+                    <TextArea fx:id="distinctiveBArea" editable="false" wrapText="true"
+                              prefRowCount="2" styleClass="form-input"
+                              promptText="Distinctive terms for Paper B…" />
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <!-- AI Comparison Output -->
+        <VBox spacing="8" styleClass="card-section">
+            <Label text="🤖 AI Comparative Analysis" styleClass="section-header" />
+            <Label text="Sections: Objectives · Methodology · Datasets · Findings · Contributions · Limitations · Similarities · Differences · Gaps"
+                   styleClass="muted-text" wrapText="true" />
+            <TextArea fx:id="aiOutputArea"
+                      editable="false"
+                      wrapText="true"
+                      prefRowCount="18"
+                      promptText="AI comparative analysis will appear here after clicking 'Compare with AI'…"
+                      styleClass="form-input" />
+            <ProgressBar fx:id="aiProgressBar" maxWidth="Infinity" prefHeight="4"
+                         style="-fx-accent: #89b4fa;" visible="false" />
+        </VBox>
+
+    </VBox>
+</ScrollPane>

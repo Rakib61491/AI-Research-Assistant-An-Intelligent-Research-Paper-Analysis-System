@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.airesearchassistant.controller.AboutController"
+            fitToWidth="true"
+            styleClass="page-scroll">
+
+    <VBox spacing="20" styleClass="page-container">
+
+        <VBox spacing="16" styleClass="card-section" alignment="CENTER" style="-fx-padding: 32;">
+            <Label fx:id="appNameLabel" text="AI Research Assistant" styleClass="about-title" />
+            <Label fx:id="versionLabel" text="Version 1.0.0" styleClass="about-version" />
+
+            <Separator styleClass="sidebar-separator" />
+
+            <Label fx:id="detailsLabel"
+                   text="An Intelligent Research Paper Analysis System"
+                   wrapText="true"
+                   textAlignment="CENTER"
+                   styleClass="about-details" />
+
+            <VBox spacing="6" alignment="CENTER" style="-fx-padding: 16 0 0 0;">
+                <Label text="Tech Stack:" style="-fx-font-weight: bold; -fx-text-fill: #89b4fa;" />
+                <Label text="Java 21 · JavaFX 21 · SQLite JDBC · Apache PDFBox · Ollama API" styleClass="muted-text" />
+            </VBox>
+        </VBox>
+
+    </VBox>
+</ScrollPane>

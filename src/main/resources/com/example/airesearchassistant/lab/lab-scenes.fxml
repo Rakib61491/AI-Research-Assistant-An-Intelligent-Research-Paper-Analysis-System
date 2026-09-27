@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.airesearchassistant.controller.lab.LabScenesController"
+            fitToWidth="true"
+            style="-fx-background-color: transparent;">
+
+    <VBox spacing="20" style="-fx-padding: 24; -fx-background-color: #1e1e2e;">
+
+        <!-- Header -->
+        <VBox spacing="4">
+            <Label text="Stage 2 — Scenes &amp; Navigation (B5 &amp; B6)"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #cdd6f4;" />
+            <Label text="Demonstrates scene switching on the same Stage and passing data to the new controller."
+                   style="-fx-font-size: 13px; -fx-text-fill: #a6adc8;" />
+        </VBox>
+
+        <!-- B5: Scene Switching -->
+        <VBox spacing="10" styleClass="lab-section">
+            <Label text="B5 — Scene Switch on Same Stage" styleClass="lab-title" />
+            <Label text="Clicking the button below swaps the current Scene on the active Stage to Page 2. Page 2 provides a Back button to swap back."
+                   style="-fx-text-fill: #bac2de; -fx-font-size: 13px;" />
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Button fx:id="b5SwitchButton"
+                        text="Go to Page 2 (B5 Scene Switch)"
+                        onAction="#handleB5SwitchScene"
+                        style="-fx-background-color: #89b4fa; -fx-text-fill: #11111b; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;" />
+            </HBox>
+        </VBox>
+
+        <!-- B6: Data Passing to Controller -->
+        <VBox spacing="10" styleClass="lab-section">
+            <Label text="B6 — Data Transfer via loader.getController().setData(text)" styleClass="lab-title" />
+            <Label text="Type any text below and click the button. The FXMLLoader loads Page 2, accesses its controller, calls setData(text), and swaps the scene."
+                   style="-fx-text-fill: #bac2de; -fx-font-size: 13px;" />
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <TextField fx:id="b6TextField"
+                           promptText="Enter some text to pass..."
+                           prefWidth="320"
+                           text="Hello from Page 1 (B6)!"
+                           style="-fx-background-color: #313244; -fx-text-fill: #cdd6f4; -fx-padding: 8 12; -fx-border-color: #45475a; -fx-border-radius: 4; -fx-background-radius: 4;" />
+                <Button fx:id="b6PassButton"
+                        text="Pass Data to Page 2 (B6)"
+                        onAction="#handleB6PassData"
+                        style="-fx-background-color: #a6e3a1; -fx-text-fill: #11111b; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;" />
+            </HBox>
+        </VBox>
+
+    </VBox>
+</ScrollPane>

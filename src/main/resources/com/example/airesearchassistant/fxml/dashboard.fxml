@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.airesearchassistant.controller.DashboardController"
+            fitToWidth="true"
+            styleClass="page-scroll">
+
+    <VBox spacing="24" styleClass="page-container">
+
+        <!-- Welcome Banner -->
+        <VBox spacing="6" styleClass="hero-banner">
+            <Label text="Welcome to AI Research Assistant" styleClass="hero-title" />
+            <Label text="Organize, inspect, analyze, and query scientific research papers with local AI."
+                   styleClass="hero-subtitle" />
+        </VBox>
+
+        <!-- Metric Cards -->
+        <HBox spacing="16">
+            <VBox spacing="8" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                <Label text="TOTAL PAPERS" styleClass="metric-header" />
+                <Label fx:id="totalPapersLabel" text="0" styleClass="metric-number" />
+                <Label text="Indexed in SQLite catalog" styleClass="metric-desc" />
+            </VBox>
+
+            <VBox spacing="8" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                <Label text="COLLECTIONS" styleClass="metric-header" />
+                <Label fx:id="totalCollectionsLabel" text="0" styleClass="metric-number" />
+                <Label text="Thematic research categories" styleClass="metric-desc" />
+            </VBox>
+
+            <VBox spacing="8" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                <Label text="STARRED PAPERS" styleClass="metric-header" />
+                <Label fx:id="totalFavoritesLabel" text="0" styleClass="metric-number" />
+                <Label text="Saved to favorites" styleClass="metric-desc" />
+            </VBox>
+
+            <VBox spacing="8" styleClass="metric-card" HBox.hgrow="ALWAYS">
+                <Label text="AI ENGINE" styleClass="metric-header" />
+                <Label fx:id="ollamaStatusLabel" text="Ready" styleClass="metric-number" />
+                <Label text="Local Ollama instance" styleClass="metric-desc" />
+            </VBox>
+        </HBox>
+
+        <!-- Quick Actions Section -->
+        <VBox spacing="12" styleClass="card-section">
+            <Label text="Quick Actions" styleClass="section-header" />
+            <HBox spacing="12">
+                <Button text="➕  Add New Paper" onAction="#handleQuickAddPaper"
+                        styleClass="primary-btn" />
+                <Button text="📚  Browse Library" onAction="#handleQuickBrowseLibrary"
+                        styleClass="secondary-btn" />
+                <Button text="🤖  Ask AI Assistant" onAction="#handleQuickOpenAssistant"
+                        styleClass="secondary-btn" />
+            </HBox>
+        </VBox>
+
+    </VBox>
+</ScrollPane>

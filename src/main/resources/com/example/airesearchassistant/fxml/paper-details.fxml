@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.airesearchassistant.controller.PaperDetailsController"
+            fitToWidth="true"
+            styleClass="page-scroll">
+
+    <VBox spacing="20" styleClass="page-container">
+
+        <!-- Top Action Bar -->
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Button text="← Back to Library" onAction="#handleBackToLibrary" styleClass="secondary-btn" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button text="🤖 Ask AI About This Paper" onAction="#handleAskAiAboutPaper" styleClass="primary-btn" />
+        </HBox>
+
+        <!-- Paper Details Card -->
+        <VBox spacing="14" styleClass="card-section">
+            <Label fx:id="paperTitleLabel" text="No Paper Selected" styleClass="paper-detail-title" />
+            <Label fx:id="paperAuthorsLabel" text="Select a paper from the Library to view details." styleClass="paper-detail-authors" />
+            <Label fx:id="paperMetaLabel" text="" styleClass="muted-text" />
+
+            <Separator styleClass="sidebar-separator" />
+
+            <Label text="Abstract" styleClass="section-header" />
+            <TextArea fx:id="paperAbstractArea" editable="false" wrapText="true" prefRowCount="6"
+                      promptText="Abstract content will appear here..." styleClass="form-input" />
+
+            <Label text="Research Notes" styleClass="section-header" />
+            <TextArea fx:id="paperNotesArea" wrapText="true" prefRowCount="4"
+                      promptText="Type personal research notes and annotations..." styleClass="form-input" />
+        </VBox>
+
+    </VBox>
+</ScrollPane>

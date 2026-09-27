@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.airesearchassistant.controller.lab.LabControls1Controller"
+            fitToWidth="true"
+            style="-fx-background-color: transparent;">
+
+    <VBox spacing="16" style="-fx-padding: 20; -fx-background-color: #1e1e2e;">
+
+        <!-- Header -->
+        <VBox spacing="4">
+            <Label text="Stage 2 — Controls Part I (C1–C10)"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #cdd6f4;" />
+            <Label text="Demonstrates standard JavaFX controls C1 through C10."
+                   style="-fx-font-size: 13px; -fx-text-fill: #a6adc8;" />
+        </VBox>
+
+        <!-- C4: @FXML initialize() Auto-run -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C4 — @FXML initialize() Demonstration" styleClass="lab-title" />
+            <Label fx:id="c4Label"
+                   text="[Waiting for initialize()...]"
+                   style="-fx-text-fill: #a6e3a1; -fx-font-weight: bold;" />
+        </VBox>
+
+        <!-- C1: TableView<Person> with PropertyValueFactory -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C1 — TableView with PropertyValueFactory" styleClass="lab-title" />
+            <TableView fx:id="c1TableView" prefHeight="140" style="-fx-background-color: #181825;">
+                <columns>
+                    <TableColumn fx:id="c1FirstNameCol" text="First Name" prefWidth="180" />
+                    <TableColumn fx:id="c1LastNameCol"  text="Last Name"  prefWidth="180" />
+                    <TableColumn fx:id="c1AgeCol"       text="Age"        prefWidth="100" />
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
+            </TableView>
+        </VBox>
+
+        <!-- C2: ImageView + getResourceAsStream with graceful fallback -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C2 — ImageView + getResourceAsStream() &amp; Graceful Fallback" styleClass="lab-title" />
+            <HBox spacing="16" alignment="CENTER_LEFT">
+                <ImageView fx:id="c2ImageView" fitWidth="64" fitHeight="64" preserveRatio="true" />
+                <VBox spacing="6">
+                    <Button text="Toggle / Change Image (Resource vs Fallback)"
+                            onAction="#handleChangeImage"
+                            style="-fx-background-color: #313244; -fx-text-fill: #cdd6f4; -fx-cursor: hand;" />
+                    <Label fx:id="c2StatusLabel"
+                           text="Status..."
+                           style="-fx-text-fill: #bac2de; -fx-font-size: 12px;" />
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <!-- C3: setOnAction in Code -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C3 — setOnAction() in Code (Button + TextField Enter)" styleClass="lab-title" />
+            <Label text="Both event listeners attached in initialize(), no onAction in FXML."
+                   style="-fx-text-fill: #a6adc8; -fx-font-size: 12px;" />
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Button fx:id="c3Button" text="Click Me (Code Handler)"
+                        style="-fx-background-color: #89b4fa; -fx-text-fill: #11111b; -fx-font-weight: bold; -fx-cursor: hand;" />
+                <TextField fx:id="c3TextField" promptText="Type here &amp; press Enter..." prefWidth="250"
+                           style="-fx-background-color: #313244; -fx-text-fill: #cdd6f4;" />
+            </HBox>
+            <Label fx:id="c3Label" text="Waiting for action..." style="-fx-text-fill: #f9e2af;" />
+        </VBox>
+
+        <!-- C5: Two ToggleGroups -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C5 — Two ToggleGroups (Gender &amp; Skill Level)" styleClass="lab-title" />
+            <HBox spacing="24" alignment="CENTER_LEFT">
+                <VBox spacing="6">
+                    <Label text="Gender:" style="-fx-font-weight: bold; -fx-text-fill: #cdd6f4;" />
+                    <HBox spacing="10">
+                        <RadioButton fx:id="c5Male" text="Male" style="-fx-text-fill: #cdd6f4;" />
+                        <RadioButton fx:id="c5Female" text="Female" style="-fx-text-fill: #cdd6f4;" />
+                        <RadioButton fx:id="c5Other" text="Other" style="-fx-text-fill: #cdd6f4;" />
+                    </HBox>
+                </VBox>
+                <VBox spacing="6">
+                    <Label text="Skill Level:" style="-fx-font-weight: bold; -fx-text-fill: #cdd6f4;" />
+                    <HBox spacing="10">
+                        <RadioButton fx:id="c5Beginner" text="Beginner" style="-fx-text-fill: #cdd6f4;" />
+                        <RadioButton fx:id="c5Intermediate" text="Intermediate" style="-fx-text-fill: #cdd6f4;" />
+                        <RadioButton fx:id="c5Expert" text="Expert" style="-fx-text-fill: #cdd6f4;" />
+                    </HBox>
+                </VBox>
+            </HBox>
+            <Label fx:id="c5Label" text="Selected:" style="-fx-text-fill: #a6e3a1; -fx-font-weight: bold;" />
+        </VBox>
+
+        <!-- C6: CheckBoxes with empty-selection handling -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C6 — CheckBoxes (Hobbies) &amp; None-Selected Handling" styleClass="lab-title" />
+            <HBox spacing="16" alignment="CENTER_LEFT">
+                <CheckBox fx:id="c6Reading" text="Reading" style="-fx-text-fill: #cdd6f4;" />
+                <CheckBox fx:id="c6Gaming" text="Gaming" style="-fx-text-fill: #cdd6f4;" />
+                <CheckBox fx:id="c6Traveling" text="Traveling" style="-fx-text-fill: #cdd6f4;" />
+                <Button text="Submit Hobbies" onAction="#handleC6Submit"
+                        style="-fx-background-color: #313244; -fx-text-fill: #cdd6f4; -fx-cursor: hand;" />
+            </HBox>
+            <Label fx:id="c6Label" text="No hobbies submitted yet" style="-fx-text-fill: #fab387;" />
+        </VBox>
+
+        <!-- C7: ChoiceBox dynamic VBox background -->
+        <VBox fx:id="c7Container" spacing="8" styleClass="lab-section">
+            <Label text="C7 — ChoiceBox Changes VBox Background via setStyle" styleClass="lab-title" />
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Label text="Choose color theme:" style="-fx-text-fill: #cdd6f4;" />
+                <ChoiceBox fx:id="c7ChoiceBox" prefWidth="150" />
+            </HBox>
+        </VBox>
+
+        <!-- C8: ComboBox -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C8 — ComboBox (5 Countries)" styleClass="lab-title" />
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <ComboBox fx:id="c8ComboBox" promptText="Select a country..." prefWidth="200" />
+                <Label fx:id="c8Label" text="No country selected" style="-fx-text-fill: #89dceb;" />
+            </HBox>
+        </VBox>
+
+        <!-- C9: DatePicker with dd MMM yyyy -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C9 — DatePicker (Formatted as dd MMM yyyy)" styleClass="lab-title" />
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <DatePicker fx:id="c9DatePicker" promptText="Pick a date..." />
+                <Label fx:id="c9Label" text="No date selected" style="-fx-text-fill: #f9e2af;" />
+            </HBox>
+        </VBox>
+
+        <!-- C10: ColorPicker -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C10 — ColorPicker (Live setTextFill)" styleClass="lab-title" />
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <ColorPicker fx:id="c10ColorPicker" />
+                <Label fx:id="c10Label" text="This text color dynamically updates from the ColorPicker!"
+                       style="-fx-font-size: 15px; -fx-font-weight: bold;" />
+            </HBox>
+        </VBox>
+
+    </VBox>
+</ScrollPane>

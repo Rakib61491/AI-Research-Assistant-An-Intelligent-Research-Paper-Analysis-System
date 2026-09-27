@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.airesearchassistant.controller.SettingsController"
+            fitToWidth="true"
+            styleClass="page-scroll">
+
+    <VBox spacing="20" styleClass="page-container">
+
+        <VBox spacing="4">
+            <Label text="Application &amp; Local AI Settings" styleClass="page-headline" />
+            <Label text="Configure local Ollama instance, inference hyperparameters, and visual theme preferences."
+                   styleClass="muted-text" />
+        </VBox>
+
+        <!-- Ollama Connection Settings Card -->
+        <VBox spacing="14" styleClass="card-section">
+            <Label text="Local Ollama AI Configuration" styleClass="section-header" />
+
+            <VBox spacing="6">
+                <Label text="Ollama Server URL" styleClass="form-label" />
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <TextField fx:id="ollamaUrlField" text="http://localhost:11434" prefWidth="380" styleClass="form-input" />
+                    <Button fx:id="testConnectionButton" text="🔌 Test Connection" onAction="#handleTestConnection" styleClass="secondary-btn" />
+                </HBox>
+                <Label fx:id="connectionStatusLabel" text="Status: Ready to test connection" styleClass="info-label" />
+            </VBox>
+
+            <!-- Model Selection -->
+            <VBox spacing="6">
+                <Label text="Active Model" styleClass="form-label" />
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <ComboBox fx:id="modelComboBox" prefWidth="380" promptText="Select an Ollama model..." styleClass="filter-combo" />
+                    <Button fx:id="refreshModelsButton" text="↻ Refresh Models" onAction="#handleRefreshModels" styleClass="secondary-btn" />
+                    <ProgressIndicator fx:id="modelLoadingIndicator" prefWidth="20" prefHeight="20" visible="false" />
+                </HBox>
+                <Label text="Ensure the model is pulled locally via terminal (e.g., `ollama pull llama3.2`)." styleClass="muted-text" />
+            </VBox>
+        </VBox>
+
+        <!-- Inference Hyperparameters Card -->
+        <VBox spacing="14" styleClass="card-section">
+            <Label text="Inference Hyperparameters" styleClass="section-header" />
+
+            <!-- Temperature Slider -->
+            <VBox spacing="6">
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <Label text="Temperature (Creativity vs Determinism):" styleClass="form-label" />
+                    <Label fx:id="temperatureValueLabel" text="0.40" styleClass="info-label" />
+                </HBox>
+                <Slider fx:id="temperatureSlider" min="0.0" max="1.0" value="0.4"
+                        showTickLabels="true" showTickMarks="true" majorTickUnit="0.2" minorTickCount="1" />
+            </VBox>
+
+            <HBox spacing="20">
+                <!-- Max Tokens Spinner -->
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label text="Max Output Tokens" styleClass="form-label" />
+                    <Spinner fx:id="maxTokensSpinner" prefWidth="200" />
+                </VBox>
+
+                <!-- Timeout Field -->
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label text="Request Timeout (Seconds)" styleClass="form-label" />
+                    <TextField fx:id="timeoutField" text="120" styleClass="form-input" />
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <!-- Visual Theme Preference -->
+        <VBox spacing="14" styleClass="card-section">
+            <Label text="Appearance &amp; Theme" styleClass="section-header" />
+            <HBox spacing="16" alignment="CENTER_LEFT">
+                <Label text="Default Theme:" styleClass="form-label" />
+                <ChoiceBox fx:id="themeChoiceBox" prefWidth="180" />
+            </HBox>
+        </VBox>
+
+        <!-- Save Button & Status -->
+        <HBox alignment="CENTER_RIGHT" spacing="16">
+            <Label fx:id="settingsStatusLabel" text="" styleClass="info-label" />
+            <Button text="💾 Save Settings" onAction="#handleSaveSettings" styleClass="primary-btn" />
+        </HBox>
+
+    </VBox>
+</ScrollPane>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<SplitPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.example.airesearchassistant.controller.CollectionsController"
+           orientation="HORIZONTAL"
+           dividerPositions="0.32"
+           styleClass="page-scroll">
+
+    <!-- LEFT: Collections List -->
+    <VBox spacing="0" style="-fx-background-color: #1e1e2e;">
+        <padding><Insets top="24" right="0" bottom="16" left="0"/></padding>
+
+        <VBox spacing="6" style="-fx-padding: 0 16 12 16;">
+            <Label text="Collections" styleClass="page-headline" />
+            <Label fx:id="statusLabel" text="Loading…" styleClass="muted-text" />
+        </VBox>
+
+        <!-- New Collection Input -->
+        <VBox spacing="8" style="-fx-padding: 0 16 16 16;">
+            <TextField fx:id="newCollectionNameField"
+                       promptText="Collection name…"
+                       styleClass="form-input" />
+            <TextField fx:id="newCollectionDescField"
+                       promptText="Description (optional)…"
+                       styleClass="form-input" />
+            <Button text="📁 Create Collection" onAction="#handleCreate"
+                    maxWidth="Infinity" styleClass="primary-btn" />
+        </VBox>
+
+        <!-- Collections ListView -->
+        <ListView fx:id="collectionsListView" VBox.vgrow="ALWAYS"
+                  styleClass="styled-list-view" />
+
+        <!-- Manage Selected -->
+        <HBox spacing="8" style="-fx-padding: 12 16 0 16;">
+            <Button fx:id="renameBtn" text="✏ Rename" onAction="#handleRename"
+                    disable="true" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="secondary-btn" />
+            <Button fx:id="deleteColBtn" text="🗑 Delete" onAction="#handleDeleteCollection"
+                    disable="true" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="danger-btn" />
+        </HBox>
+        <Button text="💾 Export Collection" onAction="#handleExport"
+                maxWidth="Infinity" style="-fx-margin: 8 16 16 16;" styleClass="secondary-btn">
+            <VBox.margin><Insets top="8" right="16" bottom="16" left="16"/></VBox.margin>
+        </Button>
+    </VBox>
+
+    <!-- RIGHT: Papers in Selected Collection -->
+    <VBox spacing="12" style="-fx-padding: 24 24 16 16; -fx-background-color: #181825;">
+
+        <VBox spacing="4">
+            <Label fx:id="collectionTitleLabel" text="Select a collection" styleClass="section-header" />
+            <Label fx:id="collectionDescLabel" text="" styleClass="muted-text" />
+        </VBox>
+
+        <!-- Papers Table -->
+        <TableView fx:id="papersTable" VBox.vgrow="ALWAYS" styleClass="papers-table">
+            <columns>
+                <TableColumn fx:id="colTitle" text="Title" prefWidth="340" />
+                <TableColumn fx:id="colAuthors" text="Authors" prefWidth="180" />
+                <TableColumn fx:id="colYear" text="Year" prefWidth="70" />
+                <TableColumn fx:id="colTopic" text="Topic" prefWidth="160" />
+            </columns>
+            <placeholder>
+                <Label text="No papers in this collection. Use 'Add Paper to Collection' below." style="-fx-text-fill: #6c7086; -fx-padding: 24;" />
+            </placeholder>
+        </TableView>
+
+        <!-- Paper Management Buttons -->
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <ComboBox fx:id="addPaperComboBox" prefWidth="300"
+                      promptText="Select paper to add…" styleClass="filter-combo" />
+            <Button text="➕ Add to Collection" onAction="#handleAddPaper" styleClass="primary-btn" />
+            <Button fx:id="removePaperBtn" text="➖ Remove" onAction="#handleRemovePaper"
+                    disable="true" styleClass="danger-btn" />
+        </HBox>
+
+    </VBox>
+</SplitPane>

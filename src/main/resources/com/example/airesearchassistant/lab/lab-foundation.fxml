@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.airesearchassistant.controller.lab.LabFoundationController"
+            fitToWidth="true">
+    <content>
+        <VBox spacing="16" style="-fx-padding: 16; -fx-background-color: #1e1e2e;">
+
+            <!-- B1: Separate Stage -->
+            <VBox styleClass="lab-section" spacing="8">
+                <Label text="B1 — Separate Stage (400×300)" styleClass="lab-title"/>
+                <Label text="Opens a new window with a Welcome label." style="-fx-text-fill: #cdd6f4;"/>
+                <Button text="Open New Stage" onAction="#openB1Stage"/>
+            </VBox>
+
+            <!-- B2: Five Layout Panes -->
+            <VBox styleClass="lab-section" spacing="10">
+                <Label text="B2 — Layout Panes" styleClass="lab-title"/>
+
+                <Label text="HBox (horizontal):" style="-fx-text-fill: #cdd6f4;"/>
+                <HBox spacing="8">
+                    <Button text="H-Btn 1"/> <Button text="H-Btn 2"/> <Button text="H-Btn 3"/>
+                </HBox>
+
+                <Label text="VBox (vertical):" style="-fx-text-fill: #cdd6f4;"/>
+                <VBox spacing="4" style="-fx-padding: 4;">
+                    <Button text="V-Btn 1"/> <Button text="V-Btn 2"/> <Button text="V-Btn 3"/>
+                </VBox>
+
+                <Label text="FlowPane (wraps automatically):" style="-fx-text-fill: #cdd6f4;"/>
+                <FlowPane hgap="6" vgap="4">
+                    <Button text="F-Btn 1"/> <Button text="F-Btn 2"/>
+                    <Button text="F-Btn 3"/> <Button text="F-Btn 4"/>
+                </FlowPane>
+
+                <Label text="StackPane (children stack/overlap):" style="-fx-text-fill: #cdd6f4;"/>
+                <StackPane style="-fx-min-height: 64; -fx-border-color: #45475a; -fx-border-width: 1; -fx-border-radius: 4;">
+                    <Button text="Bottom Layer" style="-fx-translate-x: -50;"/>
+                    <Button text="Top Layer"/>
+                </StackPane>
+
+                <Label text="BorderPane (top/left/center/right/bottom):" style="-fx-text-fill: #cdd6f4;"/>
+                <BorderPane style="-fx-min-height: 110; -fx-border-color: #45475a; -fx-border-width: 1; -fx-border-radius: 4;">
+                    <top>    <Button text="Top"    BorderPane.alignment="CENTER"/>  </top>
+                    <left>   <Button text="Left"/>                                  </left>
+                    <center> <Button text="Center"/>                                </center>
+                    <right>  <Button text="Right"/>                                 </right>
+                    <bottom> <Button text="Bottom" BorderPane.alignment="CENTER"/>  </bottom>
+                </BorderPane>
+            </VBox>
+
+            <!-- B3: FXML + FXMLLoader explanation -->
+            <VBox styleClass="lab-section" spacing="8">
+                <Label text="B3 — FXML + fx:controller + FXMLLoader" styleClass="lab-title"/>
+                <Label wrapText="true" style="-fx-text-fill: #cdd6f4;"
+                       text="Every tab in this window is loaded from its own .fxml file. Each FXML declares fx:controller to bind its controller class. MainApp uses FXMLLoader to load lab-view.fxml, which uses fx:include to pull in each tab's FXML."/>
+                <Label wrapText="true" style="-fx-text-fill: #888; -fx-font-style: italic;"
+                       text="// Pattern used here:&#10;FXMLLoader loader = new FXMLLoader(getClass().getResource(...));&#10;Parent root = loader.load();&#10;MyController ctrl = loader.getController();"/>
+            </VBox>
+
+            <!-- B4: onAction handler -->
+            <VBox styleClass="lab-section" spacing="8">
+                <Label text="B4 — onAction=&quot;#handler&quot;" styleClass="lab-title"/>
+                <Label text="The button below uses onAction in FXML — no code wiring needed." style="-fx-text-fill: #cdd6f4;"/>
+                <Button text="Click Me!" onAction="#handleB4Click"/>
+                <Label fx:id="b4Label" text="(click the button above)" style="-fx-text-fill: #f9e2af;"/>
+            </VBox>
+
+        </VBox>
+    </content>
+</ScrollPane>

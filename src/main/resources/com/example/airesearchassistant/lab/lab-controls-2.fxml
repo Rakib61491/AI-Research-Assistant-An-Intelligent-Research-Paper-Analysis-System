@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.airesearchassistant.controller.lab.LabControls2Controller"
+            fitToWidth="true"
+            style="-fx-background-color: transparent;">
+
+    <VBox spacing="16" style="-fx-padding: 20; -fx-background-color: #1e1e2e;">
+
+        <!-- Header -->
+        <VBox spacing="4">
+            <Label text="Stage 2 — Controls Part II (C11–C20)"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #cdd6f4;" />
+            <Label text="Demonstrates advanced JavaFX controls C11 through C20."
+                   style="-fx-font-size: 13px; -fx-text-fill: #a6adc8;" />
+        </VBox>
+
+        <!-- C16: MenuBar -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C16 — MenuBar (File → New, Open, Exit)" styleClass="lab-title" />
+            <MenuBar style="-fx-background-color: #313244; -fx-background-radius: 4;">
+                <menus>
+                    <Menu text="File">
+                        <items>
+                            <MenuItem text="New" onAction="#handleMenuNew" />
+                            <MenuItem text="Open" onAction="#handleMenuOpen" />
+                            <SeparatorMenuItem />
+                            <MenuItem text="Exit" onAction="#handleMenuExit" />
+                        </items>
+                    </Menu>
+                </menus>
+            </MenuBar>
+        </VBox>
+
+        <!-- C11: ListView -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C11 — ListView with Selection Listener" styleClass="lab-title" />
+            <HBox spacing="16" alignment="CENTER_LEFT">
+                <ListView fx:id="c11ListView" prefHeight="120" prefWidth="220"
+                          style="-fx-background-color: #181825;" />
+                <Label fx:id="c11Label" text="No fruit selected" style="-fx-text-fill: #a6e3a1; -fx-font-weight: bold;" />
+            </HBox>
+        </VBox>
+
+        <!-- C12: TreeView -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C12 — TreeView (Fruits &amp; Vegetables)" styleClass="lab-title" />
+            <HBox spacing="16" alignment="CENTER_LEFT">
+                <TreeView fx:id="c12TreeView" prefHeight="140" prefWidth="250"
+                          style="-fx-background-color: #181825;" />
+                <Label fx:id="c12Label" text="No item selected" style="-fx-text-fill: #89dceb; -fx-font-weight: bold;" />
+            </HBox>
+        </VBox>
+
+        <!-- C13: Progress Accumulation -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C13 — Accumulate Progress (N inputs, pressCount / N, add 1 per press)" styleClass="lab-title" />
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Label text="Target N:" style="-fx-text-fill: #cdd6f4;" />
+                <TextField fx:id="c13Input" promptText="Enter positive N..." prefWidth="120" text="5"
+                           style="-fx-background-color: #313244; -fx-text-fill: #cdd6f4;" />
+                <Button text="Accumulate (+1)" onAction="#handleC13Accumulate"
+                        style="-fx-background-color: #89b4fa; -fx-text-fill: #11111b; -fx-font-weight: bold; -fx-cursor: hand;" />
+                <Button text="Reset" onAction="#handleC13Reset"
+                        style="-fx-background-color: #313244; -fx-text-fill: #cdd6f4; -fx-cursor: hand;" />
+            </HBox>
+            <ProgressBar fx:id="c13ProgressBar" prefWidth="350" progress="0.0" />
+            <Label fx:id="c13StatusLabel" text="Press Accumulate to begin" style="-fx-text-fill: #a6adc8;" />
+            <Label fx:id="c13ErrorLabel" text="" style="-fx-text-fill: #f38ba8; -fx-font-weight: bold;" />
+        </VBox>
+
+        <!-- C14: Slider font size -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C14 — Slider (Font Size 10 to 48)" styleClass="lab-title" />
+            <HBox spacing="16" alignment="CENTER_LEFT">
+                <Slider fx:id="c14Slider" prefWidth="250" showTickLabels="true" showTickMarks="true" />
+                <Label fx:id="c14Label" text="Adjustable Text (16px)"
+                       style="-fx-font-size: 16px; -fx-text-fill: #cdd6f4;" />
+            </HBox>
+        </VBox>
+
+        <!-- C15: Spinner -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C15 — Spinner (1 to 10)" styleClass="lab-title" />
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Spinner fx:id="c15Spinner" prefWidth="100" />
+                <Button text="Show Value" onAction="#handleC15Show"
+                        style="-fx-background-color: #313244; -fx-text-fill: #cdd6f4; -fx-cursor: hand;" />
+                <Label fx:id="c15Label" text="Value: 1" style="-fx-text-fill: #f9e2af; -fx-font-weight: bold;" />
+            </HBox>
+        </VBox>
+
+        <!-- C17: 3 Alert Dialogs -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C17 — 3 Alert Dialogs (Information, Warning, Error)" styleClass="lab-title" />
+            <HBox spacing="12">
+                <Button text="Information Alert" onAction="#handleShowInfoAlert"
+                        style="-fx-background-color: #89b4fa; -fx-text-fill: #11111b; -fx-cursor: hand;" />
+                <Button text="Warning Alert" onAction="#handleShowWarningAlert"
+                        style="-fx-background-color: #f9e2af; -fx-text-fill: #11111b; -fx-cursor: hand;" />
+                <Button text="Error Alert" onAction="#handleShowErrorAlert"
+                        style="-fx-background-color: #f38ba8; -fx-text-fill: #11111b; -fx-cursor: hand;" />
+            </HBox>
+        </VBox>
+
+        <!-- C18: TextArea with Clear -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C18 — TextArea &amp; Clear Button" styleClass="lab-title" />
+            <TextArea fx:id="c18TextArea" prefRowCount="3"
+                      promptText="Type multi-line research notes here..."
+                      style="-fx-background-color: #181825; -fx-text-fill: #cdd6f4;" />
+            <HBox>
+                <Button text="Clear TextArea" onAction="#handleC18Clear"
+                        style="-fx-background-color: #313244; -fx-text-fill: #cdd6f4; -fx-cursor: hand;" />
+            </HBox>
+        </VBox>
+
+        <!-- C19: PasswordField with Show/Hide toggle -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C19 — PasswordField with Show/Hide Toggle (No Logging/Persistence)" styleClass="lab-title" />
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <StackPane alignment="CENTER_LEFT">
+                    <PasswordField fx:id="c19PasswordField" promptText="Enter secret..." prefWidth="250"
+                                   style="-fx-background-color: #313244; -fx-text-fill: #cdd6f4;" />
+                    <TextField fx:id="c19PlainTextField" promptText="Enter secret..." prefWidth="250"
+                               visible="false" managed="false"
+                               style="-fx-background-color: #313244; -fx-text-fill: #cdd6f4;" />
+                </StackPane>
+                <CheckBox fx:id="c19ShowPasswordCheckBox" text="Show Password" style="-fx-text-fill: #cdd6f4;" />
+            </HBox>
+        </VBox>
+
+        <!-- C20: FileChooser for Images -->
+        <VBox spacing="8" styleClass="lab-section">
+            <Label text="C20 — FileChooser (Image Filter, Cancel &amp; Error Handling)" styleClass="lab-title" />
+            <HBox spacing="16" alignment="CENTER_LEFT">
+                <Button text="Choose Image File..." onAction="#handleC20ChooseImage"
+                        style="-fx-background-color: #a6e3a1; -fx-text-fill: #11111b; -fx-font-weight: bold; -fx-cursor: hand;" />
+                <Label fx:id="c20StatusLabel" text="No file selected yet." style="-fx-text-fill: #a6adc8;" />
+            </HBox>
+            <ImageView fx:id="c20ImageView" fitWidth="120" fitHeight="120" preserveRatio="true" />
+        </VBox>
+
+    </VBox>
+</ScrollPane>

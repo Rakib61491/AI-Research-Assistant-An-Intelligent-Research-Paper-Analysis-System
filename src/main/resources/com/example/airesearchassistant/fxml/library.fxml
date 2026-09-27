@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.airesearchassistant.controller.LibraryController"
+            fitToWidth="true"
+            styleClass="page-scroll">
+
+    <VBox spacing="16" styleClass="page-container">
+
+        <!-- Top Header & Filter Toolbar -->
+        <VBox spacing="12" styleClass="card-section">
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <TextField fx:id="searchField"
+                           promptText="🔍 Search papers by title, author, keyword..."
+                           prefWidth="320"
+                           onAction="#handleSearch"
+                           styleClass="search-box" />
+
+                <ComboBox fx:id="topicFilterComboBox" prefWidth="180" promptText="All Topics" styleClass="filter-combo" />
+                <ComboBox fx:id="yearFilterComboBox"  prefWidth="130" promptText="All Years"  styleClass="filter-combo" />
+
+                <CheckBox fx:id="favoritesCheckBox" text="★ Favorites Only" styleClass="filter-checkbox" />
+
+                <Button text="Search" onAction="#handleSearch" styleClass="primary-btn" />
+                <Button text="↻ Refresh" onAction="#handleRefresh" styleClass="secondary-btn" />
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <Button text="➕ Add Paper" onAction="#handleAddPaper" styleClass="primary-btn" />
+                <Button text="💾 Export" onAction="#handleExport" styleClass="secondary-btn" />
+            </HBox>
+
+            <!-- Table Actions Toolbar -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label fx:id="libraryStatusLabel" text="Loading papers..." styleClass="info-label" />
+                <Region HBox.hgrow="ALWAYS" />
+
+                <Button fx:id="viewButton" text="👁 View" disable="true" onAction="#handleViewSelected" styleClass="secondary-btn" />
+                <Button fx:id="editButton" text="✏ Edit" disable="true" onAction="#handleEditSelected" styleClass="secondary-btn" />
+                <Button fx:id="deleteButton" text="🗑 Delete" disable="true" onAction="#handleDeleteSelected" styleClass="cancel-btn" />
+                <Button fx:id="openPdfButton" text="📄 Open PDF" disable="true" onAction="#handleOpenPdfSelected" styleClass="secondary-btn" />
+            </HBox>
+        </VBox>
+
+        <!-- Research Papers Table -->
+        <VBox spacing="8" styleClass="card-section" VBox.vgrow="ALWAYS">
+            <TableView fx:id="papersTable" minHeight="380" prefHeight="420" styleClass="papers-table">
+                <columns>
+                    <TableColumn fx:id="colFavorite" text="★" prefWidth="42" resizable="false" />
+                    <TableColumn fx:id="colTitle" text="Title" prefWidth="320" />
+                    <TableColumn fx:id="colAuthors" text="Authors" prefWidth="200" />
+                    <TableColumn fx:id="colYear" text="Year" prefWidth="75" />
+                    <TableColumn fx:id="colTopic" text="Topic" prefWidth="170" />
+                    <TableColumn fx:id="colAnalyzed" text="Analyzed" prefWidth="100" />
+                    <TableColumn fx:id="colActions" text="Actions" prefWidth="140" />
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
+            </TableView>
+
+            <!-- Pagination Bar -->
+            <HBox spacing="12" alignment="CENTER_RIGHT" style="-fx-padding: 8 0 0 0;">
+                <Label fx:id="paginationLabel" text="Page 1 of 1" styleClass="muted-text" />
+                <Button fx:id="prevPageButton" text="← Prev" disable="true" onAction="#handlePrevPage" styleClass="secondary-btn" />
+                <Button fx:id="nextPageButton" text="Next →" disable="true" onAction="#handleNextPage" styleClass="secondary-btn" />
+            </HBox>
+        </VBox>
+
+    </VBox>
+</ScrollPane>

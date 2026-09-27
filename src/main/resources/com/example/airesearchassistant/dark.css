@@ -1,0 +1,307 @@
+/* =============================================================
+   AI Research Assistant — Dark Theme Stylesheet (Catppuccin Mocha)
+   Overrides base styles when toggled.
+   ============================================================= */
+
+.root {
+    -fx-background-color: #1e1e2e;
+}
+
+.main-shell-root {
+    -fx-background-color: #1e1e2e;
+}
+
+/* ---- Top Bar ---- */
+.top-bar {
+    -fx-background-color: #181825;
+    -fx-border-color: transparent transparent #313244 transparent;
+}
+
+.page-title {
+    -fx-text-fill: #cdd6f4;
+}
+
+.search-box {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+    -fx-prompt-text-fill: #6c7086;
+    -fx-border-color: #45475a;
+}
+
+.search-box:focused {
+    -fx-border-color: #89b4fa;
+    -fx-background-color: #313244;
+}
+
+.ollama-badge {
+    -fx-background-color: #313244;
+    -fx-border-color: #45475a;
+}
+
+.ollama-label {
+    -fx-text-fill: #a6adc8;
+}
+
+.theme-btn {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+    -fx-border-color: #45475a;
+}
+
+.theme-btn:hover {
+    -fx-background-color: #45475a;
+}
+
+/* ---- Sidebar Navigation ---- */
+.sidebar {
+    -fx-background-color: #181825;
+    -fx-border-color: transparent #313244 transparent transparent;
+}
+
+.brand-title {
+    -fx-text-fill: #89b4fa;
+}
+
+.brand-subtitle {
+    -fx-text-fill: #a6adc8;
+}
+
+.sidebar-separator {
+    -fx-border-color: #313244;
+}
+
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #bac2de;
+}
+
+.nav-button:hover {
+    -fx-background-color: #313244;
+    -fx-text-fill: #89b4fa;
+}
+
+.nav-button-active {
+    -fx-background-color: #313244;
+    -fx-text-fill: #89b4fa;
+}
+
+/* ---- Center Content Area ---- */
+.content-area {
+    -fx-background-color: #1e1e2e;
+}
+
+/* ---- Bottom Status Bar ---- */
+.status-bar {
+    -fx-background-color: #181825;
+    -fx-border-color: #313244 transparent transparent transparent;
+}
+
+.status-item {
+    -fx-text-fill: #a6adc8;
+}
+
+.status-separator {
+    -fx-text-fill: #6c7086;
+}
+
+.status-item-subtle {
+    -fx-text-fill: #6c7086;
+}
+
+/* ---- Cards, Metrics & Sections ---- */
+.hero-banner {
+    -fx-background-color: #262940;
+    -fx-border-color: #45475a;
+}
+
+.hero-title {
+    -fx-text-fill: #89b4fa;
+}
+
+.hero-subtitle {
+    -fx-text-fill: #bac2de;
+}
+
+.card-section {
+    -fx-background-color: #242538;
+    -fx-border-color: #3b3d54;
+}
+
+.metric-card {
+    -fx-background-color: #242538;
+    -fx-border-color: #3b3d54;
+}
+
+.metric-header {
+    -fx-text-fill: #a6adc8;
+}
+
+.metric-number {
+    -fx-text-fill: #cdd6f4;
+}
+
+.metric-desc {
+    -fx-text-fill: #6c7086;
+}
+
+.section-header {
+    -fx-text-fill: #cdd6f4;
+}
+
+.page-headline {
+    -fx-text-fill: #cdd6f4;
+}
+
+.muted-text {
+    -fx-text-fill: #a6adc8;
+}
+
+.info-label {
+    -fx-text-fill: #89b4fa;
+}
+
+.form-label {
+    -fx-text-fill: #cdd6f4;
+}
+
+.form-input {
+    -fx-background-color: #1e1e2e;
+    -fx-text-fill: #cdd6f4;
+    -fx-prompt-text-fill: #6c7086;
+    -fx-border-color: #45475a;
+}
+
+.form-input:focused {
+    -fx-border-color: #89b4fa;
+}
+
+/* ---- Buttons ---- */
+.primary-btn {
+    -fx-background-color: #89b4fa;
+    -fx-text-fill: #11111b;
+}
+
+.primary-btn:hover {
+    -fx-background-color: #b4befe;
+}
+
+.secondary-btn {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+    -fx-border-color: #45475a;
+}
+
+.secondary-btn:hover {
+    -fx-background-color: #45475a;
+}
+
+.cancel-btn {
+    -fx-text-fill: #a6adc8;
+}
+
+.cancel-btn:hover {
+    -fx-text-fill: #f38ba8;
+}
+
+/* ---- Chat & List Views ---- */
+.chat-area {
+    -fx-background-color: #1e1e2e;
+    -fx-text-fill: #cdd6f4;
+    -fx-border-color: #45475a;
+}
+
+.styled-list-view {
+    -fx-background-color: #1e1e2e;
+    -fx-border-color: #45475a;
+}
+
+/* ---- About Page Details ---- */
+.about-title {
+    -fx-text-fill: #89b4fa;
+}
+
+.about-version {
+    -fx-text-fill: #a6adc8;
+}
+
+.about-details {
+    -fx-text-fill: #bac2de;
+}
+
+/* ---- Lab Section Overrides in Dark Mode ---- */
+.lab-section {
+    -fx-background-color: #242538;
+    -fx-border-color: #3b3d54;
+}
+
+.lab-title {
+    -fx-text-fill: #89b4fa;
+}
+
+.tab-pane .tab-header-area {
+    -fx-background-color: #181825;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #181825;
+}
+
+.tab-pane .tab {
+    -fx-background-color: #313244;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: #45475a;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: #cdd6f4;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: #89b4fa;
+}
+
+/* ---- TableView Dark Theme ---- */
+.papers-table {
+    -fx-background-color: #1e1e2e;
+    -fx-border-color: #3b3d54;
+}
+
+.papers-table .column-header-background {
+    -fx-background-color: #181825;
+    -fx-border-color: transparent transparent #3b3d54 transparent;
+    -fx-border-width: 1;
+}
+
+.papers-table .column-header {
+    -fx-background-color: transparent;
+    -fx-padding: 8 10;
+}
+
+.papers-table .column-header .label {
+    -fx-text-fill: #cdd6f4;
+    -fx-font-weight: bold;
+}
+
+.papers-table .table-row-cell {
+    -fx-background-color: #1e1e2e;
+    -fx-border-color: transparent transparent #2a2a3e transparent;
+}
+
+.papers-table .table-row-cell:odd {
+    -fx-background-color: #242538;
+}
+
+.papers-table .table-row-cell:hover {
+    -fx-background-color: #313244;
+}
+
+.papers-table .table-row-cell:selected {
+    -fx-background-color: #45475a;
+}
+
+.papers-table .table-row-cell:selected .text {
+    -fx-fill: #89b4fa;
+}
+

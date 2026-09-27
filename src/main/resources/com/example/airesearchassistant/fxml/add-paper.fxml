@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.airesearchassistant.controller.AddPaperController"
+            fitToWidth="true"
+            styleClass="page-scroll">
+
+    <VBox spacing="16" styleClass="page-container">
+
+        <!-- Top Header Banner -->
+        <VBox spacing="4">
+            <Label fx:id="pageHeadlineLabel" text="Add / Import Research Paper" styleClass="page-headline" />
+            <Label fx:id="formStatusLabel" text="Fill in paper details or import a PDF/TXT document to autofill." styleClass="muted-text" />
+        </VBox>
+
+        <!-- Main TabPane -->
+        <TabPane fx:id="addPaperTabPane" tabClosingPolicy="UNAVAILABLE" styleClass="styled-tab-pane">
+            <tabs>
+                <!-- Tab 1: File Import (Stage 5) -->
+                <Tab fx:id="importTab" text="📄 Import Document (PDF / TXT)">
+                    <VBox spacing="14" styleClass="card-section" style="-fx-padding: 20;">
+                        <!-- File Chooser Toolbar -->
+                        <HBox spacing="14" alignment="CENTER_LEFT">
+                            <Button text="📂 Choose PDF / TXT File..."
+                                    onAction="#handleChooseFile"
+                                    styleClass="primary-btn" />
+                            <Label fx:id="selectedFileLabel" text="No file selected" styleClass="muted-text" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <ProgressIndicator fx:id="importProgressIndicator" prefWidth="24" prefHeight="24" visible="false" />
+                        </HBox>
+
+                        <ProgressBar fx:id="importProgressBar" maxWidth="Infinity" visible="false" />
+                        <Label fx:id="importStatusLabel" text="Ready to import PDF or TXT document (up to 50 MB)." styleClass="info-label" />
+
+                        <!-- Raw Text Preview (Editable) -->
+                        <VBox spacing="6" VBox.vgrow="ALWAYS">
+                            <Label text="Document Text Preview (Editable):" styleClass="form-label" />
+                            <TextArea fx:id="previewTextArea"
+                                      wrapText="true"
+                                      prefRowCount="14"
+                                      promptText="Extracted document text will appear here. You can inspect or edit it before saving..."
+                                      styleClass="form-input" />
+                        </VBox>
+
+                        <!-- Bottom Action -->
+                        <HBox spacing="12" alignment="CENTER_RIGHT" style="-fx-padding: 8 0 0 0;">
+                            <Button fx:id="applyMetadataButton"
+                                    text="Next: Review &amp; Save Metadata →"
+                                    disable="true"
+                                    onAction="#handleApplyMetadata"
+                                    styleClass="primary-btn" />
+                        </HBox>
+                    </VBox>
+                </Tab>
+
+                <!-- Tab 2: Metadata Form -->
+                <Tab fx:id="manualTab" text="✏️ Paper Details &amp; Metadata">
+                    <VBox spacing="14" styleClass="card-section" style="-fx-padding: 20;">
+                        <VBox spacing="6">
+                            <Label text="Paper Title *" styleClass="form-label" />
+                            <TextField fx:id="titleField" promptText="e.g. Attention Is All You Need" styleClass="form-input" />
+                        </VBox>
+
+                        <HBox spacing="16">
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label text="Authors" styleClass="form-label" />
+                                <TextField fx:id="authorsField" promptText="e.g. Ashish Vaswani, Noam Shazeer, et al." styleClass="form-input" />
+                            </VBox>
+                            <VBox spacing="6" prefWidth="160">
+                                <Label text="Publication Year" styleClass="form-label" />
+                                <TextField fx:id="yearField" promptText="e.g. 2017 (4 digits)" styleClass="form-input" />
+                            </VBox>
+                        </HBox>
+
+                        <HBox spacing="16">
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label text="Journal / Conference Venue" styleClass="form-label" />
+                                <TextField fx:id="venueField" promptText="e.g. NeurIPS 2017" styleClass="form-input" />
+                            </VBox>
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label text="DOI / Identifier" styleClass="form-label" />
+                                <TextField fx:id="doiField" promptText="e.g. 10.48550/arXiv.1706.03762" styleClass="form-input" />
+                            </VBox>
+                        </HBox>
+
+                        <HBox spacing="16">
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label text="Research Topic / Category" styleClass="form-label" />
+                                <TextField fx:id="topicField" promptText="e.g. Natural Language Processing" styleClass="form-input" />
+                            </VBox>
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label text="Keywords" styleClass="form-label" />
+                                <TextField fx:id="keywordsField" promptText="e.g. transformers, self-attention, deep learning" styleClass="form-input" />
+                            </VBox>
+                        </HBox>
+
+                        <VBox spacing="6">
+                            <Label text="Document File Path" styleClass="form-label" />
+                            <TextField fx:id="filePathField" promptText="Local file path of the paper..." styleClass="form-input" />
+                        </VBox>
+
+                        <VBox spacing="6">
+                            <Label text="Abstract" styleClass="form-label" />
+                            <TextArea fx:id="abstractArea" promptText="Paste paper abstract or extract from document..."
+                                      prefRowCount="4" wrapText="true" styleClass="form-input" />
+                        </VBox>
+
+                        <VBox spacing="6">
+                            <Label text="Personal Research Notes" styleClass="form-label" />
+                            <TextArea fx:id="notesArea" promptText="Add personal annotations, critique, or takeaways..."
+                                      prefRowCount="3" wrapText="true" styleClass="form-input" />
+                        </VBox>
+
+                        <!-- Action Buttons -->
+                        <HBox spacing="12" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
+                            <Button text="Clear" onAction="#handleClearForm" styleClass="cancel-btn" />
+                            <Button text="Cancel" onAction="#handleCancel" styleClass="cancel-btn" />
+                            <Button text="💾 Save Paper" onAction="#handleSavePaper" styleClass="primary-btn" />
+                        </HBox>
+                    </VBox>
+                </Tab>
+            </tabs>
+        </TabPane>
+
+    </VBox>
+</ScrollPane>

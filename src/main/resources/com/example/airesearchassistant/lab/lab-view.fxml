@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+
+<!-- lab-view.fxml — TabPane host for all 4 lab tabs.
+     No controller needed: each included FXML has its own. -->
+<TabPane xmlns="http://javafx.com/javafx/21"
+         xmlns:fx="http://javafx.com/fxml/1"
+         tabClosingPolicy="UNAVAILABLE">
+    <tabs>
+        <Tab text="Foundation (B1–B4)">
+            <content>
+                <fx:include source="lab-foundation.fxml"/>
+            </content>
+        </Tab>
+        <Tab text="Scenes (B5–B6)">
+            <content>
+                <fx:include source="lab-scenes.fxml"/>
+            </content>
+        </Tab>
+        <Tab text="Controls I (C1–C10)">
+            <content>
+                <fx:include source="lab-controls-1.fxml"/>
+            </content>
+        </Tab>
+        <Tab text="Controls II (C11–C20)">
+            <content>
+                <fx:include source="lab-controls-2.fxml"/>
+            </content>
+        </Tab>
+    </tabs>
+</TabPane>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.airesearchassistant.controller.lab.LabB6Page2Controller"
+      alignment="CENTER"
+      spacing="20"
+      style="-fx-background-color: #1e1e2e; -fx-padding: 40;">
+
+    <Label text="Page 2 (B6 Data Transfer Target)"
+           style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #a6e3a1;" />
+
+    <Label text="Data received via loader.getController().setData(text):"
+           style="-fx-font-size: 14px; -fx-text-fill: #a6adc8;" />
+
+    <Label fx:id="receivedDataLabel"
+           text="[Waiting for data...]"
+           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #f9e2af; -fx-background-color: #313244; -fx-padding: 12 24; -fx-background-radius: 8;" />
+
+    <Button fx:id="backButton"
+            text="← Back to Lab View"
+            onAction="#handleBack"
+            style="-fx-background-color: #313244; -fx-text-fill: #cdd6f4; -fx-font-size: 14px; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;" />
+
+</VBox>

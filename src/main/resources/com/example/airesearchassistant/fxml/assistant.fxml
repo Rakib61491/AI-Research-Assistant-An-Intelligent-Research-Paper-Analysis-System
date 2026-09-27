@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.airesearchassistant.controller.AssistantController"
+            fitToWidth="true"
+            styleClass="page-scroll">
+
+    <VBox spacing="16" styleClass="page-container">
+
+        <!-- Top Offline Banner (Visible when Ollama is unreachable) -->
+        <HBox fx:id="offlineBanner" alignment="CENTER_LEFT" spacing="12"
+              visible="false" managed="false"
+              style="-fx-background-color: #f38ba8; -fx-padding: 12 18; -fx-background-radius: 8;">
+            <Label text="⚠️ Ollama is not reachable."
+                   style="-fx-font-weight: bold; -fx-text-fill: #11111b; -fx-font-size: 13px;" />
+            <Label text="Install Ollama from ollama.com, run `ollama pull llama3.2`, then Test Connection in Settings."
+                   style="-fx-text-fill: #11111b; -fx-font-size: 13px;" />
+        </HBox>
+
+        <!-- Main Split / Workspace Layout -->
+        <HBox spacing="18" VBox.vgrow="ALWAYS">
+
+            <!-- Left Control Panel -->
+            <VBox spacing="14" prefWidth="300" styleClass="card-section">
+                <Label text="Target Research Paper" styleClass="section-header" />
+                <ComboBox fx:id="paperComboBox" maxWidth="Infinity" promptText="Select a paper..." styleClass="filter-combo" />
+
+                <Separator styleClass="sidebar-separator" />
+
+                <Label text="AI Analytical Actions" styleClass="section-header" />
+                <Button fx:id="summarizeButton" text="📋  Summarize Paper" maxWidth="Infinity"
+                        onAction="#handleSummarize" styleClass="primary-btn" />
+                <Button fx:id="extractButton" text="🔍  Extract Information" maxWidth="Infinity"
+                        onAction="#handleExtractInfo" styleClass="secondary-btn" />
+                <Button fx:id="classifyButton" text="🏷  Classify Topic" maxWidth="Infinity"
+                        onAction="#handleClassifyTopic" styleClass="secondary-btn" />
+
+                <!-- Progress & Cancel Bar -->
+                <HBox fx:id="progressBox" alignment="CENTER_LEFT" spacing="10"
+                      style="-fx-background-color: #313244; -fx-padding: 10; -fx-background-radius: 6;">
+                    <ProgressIndicator fx:id="aiProgressIndicator" prefWidth="20" prefHeight="20" />
+                    <Label fx:id="progressStatusLabel" text="Analyzing..." HBox.hgrow="ALWAYS" style="-fx-text-fill: #89b4fa; -fx-font-size: 12px;" />
+                    <Button fx:id="cancelTaskButton" text="Cancel" onAction="#handleCancelTask" styleClass="cancel-btn" />
+                </HBox>
+            </VBox>
+
+            <!-- Right Results TabPane -->
+            <VBox spacing="12" HBox.hgrow="ALWAYS">
+                <TabPane fx:id="analysisTabPane" tabClosingPolicy="UNAVAILABLE" styleClass="styled-tab-pane" VBox.vgrow="ALWAYS">
+                    <tabs>
+
+                        <!-- Tab 1: 7-Section Summary -->
+                        <Tab fx:id="summaryTab" text="📑 7-Section Summary">
+                            <VBox spacing="12" styleClass="card-section" style="-fx-padding: 18;">
+                                <HBox alignment="CENTER_LEFT" spacing="12">
+                                    <Label text="Structured Analytical Summary" styleClass="section-header" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Button fx:id="copySummaryButton" text="📋 Copy" onAction="#handleCopySummary" styleClass="secondary-btn" />
+                                    <Button fx:id="saveSummaryButton" text="💾 Save to Paper" onAction="#handleSaveSummary" styleClass="primary-btn" />
+                                </HBox>
+
+                                <TextArea fx:id="summaryTextArea" wrapText="true" prefRowCount="16"
+                                          promptText="Click 'Summarize Paper' on the left to produce a 7-section structured summary (Problem, Objectives, Methodology, Findings, Contributions, Limitations, Future Work)..."
+                                          styleClass="form-input" VBox.vgrow="ALWAYS" />
+
+                                <Label fx:id="summaryStatusLabel" text="" styleClass="info-label" />
+                            </VBox>
+                        </Tab>
+
+                        <!-- Tab 2: Extracted Information -->
+                        <Tab fx:id="extractedTab" text="🔍 Extracted Info">
+                            <VBox spacing="12" styleClass="card-section" style="-fx-padding: 18;">
+                                <HBox alignment="CENTER_LEFT" spacing="12">
+                                    <Label text="Key Information &amp; Insights" styleClass="section-header" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Button fx:id="saveExtractedButton" text="💾 Save Extracted Info to Paper"
+                                            onAction="#handleSaveExtracted" styleClass="primary-btn" />
+                                </HBox>
+
+                                <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                                    <VBox spacing="10">
+                                        <VBox spacing="4">
+                                            <Label text="Abstract:" styleClass="form-label" />
+                                            <TextArea fx:id="extractedAbstractArea" prefRowCount="3" wrapText="true" styleClass="form-input" />
+                                        </VBox>
+                                        <VBox spacing="4">
+                                            <Label text="Methodology:" styleClass="form-label" />
+                                            <TextArea fx:id="extractedMethodologyArea" prefRowCount="3" wrapText="true" styleClass="form-input" />
+                                        </VBox>
+                                        <VBox spacing="4">
+                                            <Label text="Main Findings:" styleClass="form-label" />
+                                            <TextArea fx:id="extractedFindingsArea" prefRowCount="3" wrapText="true" styleClass="form-input" />
+                                        </VBox>
+                                        <HBox spacing="12">
+                                            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                                <Label text="Keywords:" styleClass="form-label" />
+                                                <TextField fx:id="extractedKeywordsField" styleClass="form-input" />
+                                            </VBox>
+                                            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                                <Label text="Research Topic:" styleClass="form-label" />
+                                                <TextField fx:id="extractedTopicField" styleClass="form-input" />
+                                            </VBox>
+                                        </HBox>
+                                        <VBox spacing="4">
+                                            <Label text="Contributions:" styleClass="form-label" />
+                                            <TextArea fx:id="extractedContributionsArea" prefRowCount="3" wrapText="true" styleClass="form-input" />
+                                        </VBox>
+                                        <VBox spacing="4">
+                                            <Label text="Limitations:" styleClass="form-label" />
+                                            <TextArea fx:id="extractedLimitationsArea" prefRowCount="3" wrapText="true" styleClass="form-input" />
+                                        </VBox>
+                                    </VBox>
+                                </ScrollPane>
+
+                                <Label fx:id="extractedStatusLabel" text="" styleClass="info-label" />
+                            </VBox>
+                        </Tab>
+
+                        <!-- Tab 3: Q&A Chat -->
+                        <Tab fx:id="qaTab" text="💬 Paper Q&amp;A Chat">
+                            <VBox spacing="12" styleClass="card-section" style="-fx-padding: 18;">
+                                <Label text="Context-Aware Q&amp;A on Selected Paper" styleClass="section-header" />
+
+                                <ListView fx:id="chatListView" prefHeight="320" styleClass="styled-list-view" VBox.vgrow="ALWAYS" />
+
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <TextField fx:id="chatInputField"
+                                               promptText="Ask a question about the selected paper..."
+                                               onAction="#handleSendChat"
+                                               HBox.hgrow="ALWAYS"
+                                               styleClass="form-input" />
+                                    <Button fx:id="sendChatButton" text="🚀 Send" onAction="#handleSendChat" styleClass="primary-btn" />
+                                </HBox>
+                            </VBox>
+                        </Tab>
+
+                    </tabs>
+                </TabPane>
+            </VBox>
+
+        </HBox>
+
+        <!-- Export Row -->
+        <HBox alignment="CENTER_RIGHT" spacing="12" style="-fx-padding: 0 0 4 0;">
+            <Button text="💾 Export Output" onAction="#handleExport" styleClass="secondary-btn" />
+        </HBox>
+
+    </VBox>
+</ScrollPane>
