@@ -47,4 +47,15 @@ public class paperAnalyzingMaterial {
     public void setYear(int year) {
         this.year = year;
     }
+
+    public void showPaperAnalysispdf() {
+        System.out.println("================================");
+        System.out.println("       RESEARCH PAPER ANALYSIS");
+        System.out.println("================================");
+        System.out.println("Paper Count : " + paper_count);
+        System.out.println("Paper Name  : " + paper_name);
+        System.out.println("Author      : " + author);
+        System.out.println("Year        : " + year);
+        System.out.println("================================");
+    }
 }
