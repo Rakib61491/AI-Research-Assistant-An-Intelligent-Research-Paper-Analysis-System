@@ -4,6 +4,7 @@ import com.example.airesearchassistant.model.AppSettings;
 import com.example.airesearchassistant.service.OllamaException;
 import com.example.airesearchassistant.service.SettingsService;
 import com.example.airesearchassistant.util.AlertUtil;
+import com.example.airesearchassistant.util.SceneManager;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;

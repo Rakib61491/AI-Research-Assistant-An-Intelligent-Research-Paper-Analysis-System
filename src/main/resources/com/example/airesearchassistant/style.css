@@ -273,10 +273,65 @@
     -fx-border-color: #d0d7de;
     -fx-border-radius: 6;
     -fx-border-width: 1;
+    -fx-highlight-fill: #0969da;
+    -fx-highlight-text-fill: #ffffff;
 }
 
 .form-input:focused {
     -fx-border-color: #0969da;
+}
+
+/* ---- TextArea inner node overrides (light mode) ---- */
+.text-area {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #1f2328;
+    -fx-control-inner-background: #ffffff;
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: #0969da;
+}
+
+.text-area .content {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #1f2328;
+    -fx-control-inner-background: #ffffff;
+}
+
+.text-area .scroll-pane {
+    -fx-background-color: #ffffff;
+}
+
+.text-area .scroll-pane .viewport {
+    -fx-background-color: #ffffff;
+}
+
+/* ---- TextField inner node overrides (light mode) ---- */
+.text-field {
+    -fx-text-fill: #1f2328;
+    -fx-control-inner-background: #ffffff;
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: #0969da;
+    -fx-background-color: #ffffff;
+    -fx-prompt-text-fill: #8c95a0;
+}
+
+/* ---- ListView inner node light mode ---- */
+.styled-list-view .list-cell {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #1f2328;
+}
+
+.styled-list-view .list-cell:odd {
+    -fx-background-color: #fafbfc;
+}
+
+.styled-list-view .list-cell:hover {
+    -fx-background-color: #f2f7fc;
+    -fx-text-fill: #0969da;
+}
+
+.styled-list-view .list-cell:selected {
+    -fx-background-color: #ddf4ff;
+    -fx-text-fill: #0969da;
 }
 
 /* ---- Buttons ---- */
@@ -437,12 +492,27 @@
     -fx-border-color: transparent transparent #f0f2f5 transparent;
 }
 
+/* Explicit text fill for ALL cell rows — required because JavaFX Text
+   sub-nodes don't always inherit -fx-text-fill from parent selectors */
+.papers-table .table-row-cell .text {
+    -fx-fill: #1f2328;
+    -fx-font-size: 13px;
+}
+
 .papers-table .table-row-cell:odd {
     -fx-background-color: #fafbfc;
 }
 
+.papers-table .table-row-cell:odd .text {
+    -fx-fill: #1f2328;
+}
+
 .papers-table .table-row-cell:hover {
     -fx-background-color: #f2f7fc;
+}
+
+.papers-table .table-row-cell:hover .text {
+    -fx-fill: #0969da;
 }
 
 .papers-table .table-row-cell:selected {
@@ -451,5 +521,24 @@
 
 .papers-table .table-row-cell:selected .text {
     -fx-fill: #0969da;
+    -fx-font-weight: bold;
+}
+
+/* Filter ComboBox (light) */
+.filter-combo {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d0d7de;
+    -fx-border-radius: 6;
+    -fx-padding: 4 8;
+}
+
+.filter-combo .list-cell {
+    -fx-text-fill: #1f2328;
+    -fx-background-color: #ffffff;
+}
+
+/* Filter Checkbox (light) */
+.filter-checkbox {
+    -fx-text-fill: #343a40;
 }
 

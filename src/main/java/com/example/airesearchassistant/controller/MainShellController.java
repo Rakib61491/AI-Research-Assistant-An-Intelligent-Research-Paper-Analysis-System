@@ -46,7 +46,6 @@ public class MainShellController {
     @FXML private Button navAssistant;
     @FXML private Button navComparison;
     @FXML private Button navCollections;
-    @FXML private Button navFavorites;
     @FXML private Button navLab;
     @FXML private Button navSettings;
     @FXML private Button navAbout;
@@ -121,7 +120,6 @@ public class MainShellController {
         if (navAssistant != null) navAssistant.setTooltip(new Tooltip("AI summarization, extraction, and Q&A chat"));
         if (navComparison != null) navComparison.setTooltip(new Tooltip("Compare two papers with local similarity & AI"));
         if (navCollections != null) navCollections.setTooltip(new Tooltip("Organize papers into custom collections"));
-        if (navFavorites != null) navFavorites.setTooltip(new Tooltip("View favorite papers"));
         if (navLab != null) navLab.setTooltip(new Tooltip("JavaFX Lab demo exercises (B1–B6, C1–C20)"));
         if (navSettings != null) navSettings.setTooltip(new Tooltip("Configure Ollama endpoint and AI parameters"));
         if (navAbout != null) navAbout.setTooltip(new Tooltip("About AI Research Assistant"));
@@ -173,11 +171,6 @@ public class MainShellController {
     @FXML private void handleNavAssistant()   { SceneManager.getInstance().load(Constants.FXML_ASSISTANT); }
     @FXML private void handleNavComparison()  { SceneManager.getInstance().load(Constants.FXML_COMPARISON); }
     @FXML private void handleNavCollections() { SceneManager.getInstance().load(Constants.FXML_COLLECTIONS); }
-    @FXML
-    private void handleNavFavorites() {
-        LibraryController.filterFavoritesInitial = true;
-        SceneManager.getInstance().load(Constants.FXML_LIBRARY);
-    }
     @FXML private void handleNavLab()         { SceneManager.getInstance().load(Constants.FXML_LAB_VIEW); }
     @FXML private void handleNavSettings()    { SceneManager.getInstance().load(Constants.FXML_SETTINGS); }
     @FXML private void handleNavAbout()       { SceneManager.getInstance().load(Constants.FXML_ABOUT); }

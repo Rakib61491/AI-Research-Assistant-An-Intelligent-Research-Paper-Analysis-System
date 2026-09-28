@@ -31,7 +31,7 @@ public class OllamaService {
 
     public OllamaService() {
         this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(10))
+                .connectTimeout(Duration.ofSeconds(30))
                 .build();
         this.objectMapper = new ObjectMapper();
     }
@@ -150,7 +150,10 @@ public class OllamaService {
         } catch (ConnectException e) {
             throw new OllamaException("Cannot connect to Ollama at " + baseUrl + ". Please verify Ollama is running.", e);
         } catch (HttpTimeoutException e) {
-            throw new OllamaException("Ollama generation timed out. Consider increasing timeout in Settings.", e);
+            throw new OllamaException(
+                "Ollama generation timed out after " + (timeout != null ? timeout.getSeconds() : 120) + "s.\n" +
+                "The model '" + model + "' may need more time to load or generate.\n" +
+                "Go to Settings and increase the Timeout (seconds) value.", e);
         } catch (IOException | InterruptedException e) {
             throw new OllamaException("Error during Ollama generation: " + e.getMessage(), e);
         }
@@ -197,7 +200,10 @@ public class OllamaService {
         } catch (ConnectException e) {
             throw new OllamaException("Cannot connect to Ollama at " + baseUrl + ". Please verify Ollama is running.", e);
         } catch (HttpTimeoutException e) {
-            throw new OllamaException("Ollama chat timed out. Consider increasing timeout in Settings.", e);
+            throw new OllamaException(
+                "Ollama chat timed out after " + (timeout != null ? timeout.getSeconds() : 120) + "s.\n" +
+                "The model '" + model + "' may need more time to load or generate.\n" +
+                "Go to Settings and increase the Timeout (seconds) value.", e);
         } catch (IOException | InterruptedException e) {
             throw new OllamaException("Error during Ollama chat: " + e.getMessage(), e);
         }

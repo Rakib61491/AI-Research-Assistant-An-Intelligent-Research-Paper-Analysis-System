@@ -12,37 +12,41 @@
     <VBox spacing="16" styleClass="page-container">
 
         <!-- Top Header & Filter Toolbar -->
-        <VBox spacing="12" styleClass="card-section">
-            <HBox spacing="12" alignment="CENTER_LEFT">
+        <VBox spacing="10" styleClass="card-section">
+
+            <!-- Row 1: Search Bar + Filter ComboBoxes -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
                 <TextField fx:id="searchField"
-                           promptText="🔍 Search papers by title, author, keyword..."
-                           prefWidth="320"
+                           promptText="🔍 Search by title, author, keyword..."
+                           prefWidth="300"
                            onAction="#handleSearch"
+                           HBox.hgrow="ALWAYS"
                            styleClass="search-box" />
 
-                <ComboBox fx:id="topicFilterComboBox" prefWidth="180" promptText="All Topics" styleClass="filter-combo" />
-                <ComboBox fx:id="yearFilterComboBox"  prefWidth="130" promptText="All Years"  styleClass="filter-combo" />
+                <Button text="🔍 Search" onAction="#handleSearch" styleClass="primary-btn"
+                        minWidth="100" />
 
-                <CheckBox fx:id="favoritesCheckBox" text="★ Favorites Only" styleClass="filter-checkbox" />
-
-                <Button text="Search" onAction="#handleSearch" styleClass="primary-btn" />
-                <Button text="↻ Refresh" onAction="#handleRefresh" styleClass="secondary-btn" />
-
-                <Region HBox.hgrow="ALWAYS" />
-
-                <Button text="➕ Add Paper" onAction="#handleAddPaper" styleClass="primary-btn" />
-                <Button text="💾 Export" onAction="#handleExport" styleClass="secondary-btn" />
+                <ComboBox fx:id="topicFilterComboBox" prefWidth="170" promptText="All Topics" styleClass="filter-combo" />
+                <ComboBox fx:id="yearFilterComboBox"  prefWidth="120" promptText="All Years"  styleClass="filter-combo" />
             </HBox>
 
-            <!-- Table Actions Toolbar -->
+            <!-- Row 2: Primary Action Buttons -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button text="➕  Add Paper"  onAction="#handleAddPaper"  styleClass="primary-btn"   minWidth="130" />
+                <Button text="💾  Export"     onAction="#handleExport"    styleClass="secondary-btn" minWidth="110" />
+                <Button text="↻  Refresh"    onAction="#handleRefresh"   styleClass="secondary-btn" minWidth="110" />
+                <CheckBox fx:id="favoritesCheckBox" text="★ Show Favorites Only" styleClass="filter-checkbox" />
+            </HBox>
+
+            <!-- Row 3: Selection-Dependent Actions + Status -->
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label fx:id="libraryStatusLabel" text="Loading papers..." styleClass="info-label" />
                 <Region HBox.hgrow="ALWAYS" />
 
-                <Button fx:id="viewButton" text="👁 View" disable="true" onAction="#handleViewSelected" styleClass="secondary-btn" />
-                <Button fx:id="editButton" text="✏ Edit" disable="true" onAction="#handleEditSelected" styleClass="secondary-btn" />
-                <Button fx:id="deleteButton" text="🗑 Delete" disable="true" onAction="#handleDeleteSelected" styleClass="cancel-btn" />
-                <Button fx:id="openPdfButton" text="📄 Open PDF" disable="true" onAction="#handleOpenPdfSelected" styleClass="secondary-btn" />
+                <Button fx:id="viewButton"    text="👁  View Paper"  disable="true" onAction="#handleViewSelected"    styleClass="secondary-btn" minWidth="120" />
+                <Button fx:id="editButton"    text="✏  Edit"         disable="true" onAction="#handleEditSelected"    styleClass="secondary-btn" minWidth="90"  />
+                <Button fx:id="deleteButton"  text="🗑  Delete"       disable="true" onAction="#handleDeleteSelected"  styleClass="cancel-btn"    minWidth="100" />
+                <Button fx:id="openPdfButton" text="📄  Open PDF"     disable="true" onAction="#handleOpenPdfSelected" styleClass="secondary-btn" minWidth="120" />
             </HBox>
         </VBox>
 
@@ -50,13 +54,13 @@
         <VBox spacing="8" styleClass="card-section" VBox.vgrow="ALWAYS">
             <TableView fx:id="papersTable" minHeight="380" prefHeight="420" styleClass="papers-table">
                 <columns>
-                    <TableColumn fx:id="colFavorite" text="★" prefWidth="42" resizable="false" />
-                    <TableColumn fx:id="colTitle" text="Title" prefWidth="320" />
-                    <TableColumn fx:id="colAuthors" text="Authors" prefWidth="200" />
-                    <TableColumn fx:id="colYear" text="Year" prefWidth="75" />
-                    <TableColumn fx:id="colTopic" text="Topic" prefWidth="170" />
-                    <TableColumn fx:id="colAnalyzed" text="Analyzed" prefWidth="100" />
-                    <TableColumn fx:id="colActions" text="Actions" prefWidth="140" />
+                    <TableColumn fx:id="colFavorite" text="★"        prefWidth="42"  resizable="false" />
+                    <TableColumn fx:id="colTitle"    text="Title"     prefWidth="300" style="-fx-font-weight: bold;" />
+                    <TableColumn fx:id="colAuthors"  text="Authors"   prefWidth="190" />
+                    <TableColumn fx:id="colYear"     text="Year"      prefWidth="70"  />
+                    <TableColumn fx:id="colTopic"    text="Topic"     prefWidth="160" />
+                    <TableColumn fx:id="colAnalyzed" text="Analyzed"  prefWidth="90"  />
+                    <TableColumn fx:id="colActions"  text="Actions"   prefWidth="150" />
                 </columns>
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -66,8 +70,8 @@
             <!-- Pagination Bar -->
             <HBox spacing="12" alignment="CENTER_RIGHT" style="-fx-padding: 8 0 0 0;">
                 <Label fx:id="paginationLabel" text="Page 1 of 1" styleClass="muted-text" />
-                <Button fx:id="prevPageButton" text="← Prev" disable="true" onAction="#handlePrevPage" styleClass="secondary-btn" />
-                <Button fx:id="nextPageButton" text="Next →" disable="true" onAction="#handleNextPage" styleClass="secondary-btn" />
+                <Button fx:id="prevPageButton" text="← Prev" disable="true" onAction="#handlePrevPage" styleClass="secondary-btn" minWidth="80" />
+                <Button fx:id="nextPageButton" text="Next →" disable="true" onAction="#handleNextPage" styleClass="secondary-btn" minWidth="80" />
             </HBox>
         </VBox>
 

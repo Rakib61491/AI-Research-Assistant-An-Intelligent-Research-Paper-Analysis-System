@@ -36,6 +36,7 @@ public class AssistantController {
 
     // Offline Banner
     @FXML private HBox offlineBanner;
+    @FXML private Label offlineBannerDetailLabel;
 
     // Left Panel: Paper Selection & Action Buttons
     @FXML private ComboBox<ResearchPaper> paperComboBox;
@@ -106,10 +107,12 @@ public class AssistantController {
 
     private void checkOllamaConnectionAsync() {
         AppSettings settings = settingsService.getSettings();
+        String url = settings.getOllamaUrl();
+        String model = settings.getDefaultModel();
         Task<Boolean> checkTask = new Task<>() {
             @Override
             protected Boolean call() {
-                return settingsService.testOllamaConnection(settings.getOllamaUrl());
+                return settingsService.testOllamaConnection(url);
             }
         };
 
@@ -119,12 +122,24 @@ public class AssistantController {
                 offlineBanner.setVisible(!online);
                 offlineBanner.setManaged(!online);
             }
+            if (!online && offlineBannerDetailLabel != null) {
+                offlineBannerDetailLabel.setText(
+                    "URL: " + url + "  |  Model: " + model +
+                    "  — Make sure Ollama is running and the model is pulled."
+                );
+            }
         });
 
         checkTask.setOnFailed(e -> {
             if (offlineBanner != null) {
                 offlineBanner.setVisible(true);
                 offlineBanner.setManaged(true);
+            }
+            if (offlineBannerDetailLabel != null) {
+                offlineBannerDetailLabel.setText(
+                    "URL: " + url + "  |  Model: " + model +
+                    "  — Could not reach Ollama. Is it installed and running?"
+                );
             }
         });
 
@@ -475,19 +490,35 @@ public class AssistantController {
 
     private void handleTaskFailure(Throwable ex, String title) {
         hideProgress();
+        AppSettings settings = settingsService.getSettings();
+        String configInfo = "URL: " + settings.getOllamaUrl() + ", Model: " + settings.getDefaultModel();
         String message = (ex instanceof OllamaException)
-                ? ex.getMessage()
+                ? ex.getMessage() + "\n\n" + configInfo
                 : (ex != null && ex.getMessage() != null)
-                ? ex.getMessage()
-                : "An error occurred while communicating with Ollama.";
+                ? ex.getMessage() + "\n\n" + configInfo
+                : "An error occurred while communicating with Ollama.\n\n" + configInfo;
 
-        // If offline, ensure banner is displayed
+        // If offline, ensure banner is displayed with details
         if (offlineBanner != null) {
             offlineBanner.setVisible(true);
             offlineBanner.setManaged(true);
         }
+        if (offlineBannerDetailLabel != null) {
+            offlineBannerDetailLabel.setText(
+                configInfo + "  — Click Reconnect to retry connection."
+            );
+        }
 
         AlertUtil.showError(title, "Local AI Execution Error", message);
+    }
+
+    /** Re-tests the Ollama connection and hides/shows the banner accordingly. */
+    @FXML
+    private void handleReconnect() {
+        if (offlineBannerDetailLabel != null) {
+            offlineBannerDetailLabel.setText("Testing connection…");
+        }
+        checkOllamaConnectionAsync();
     }
 
     private ResearchPaper getSelectedPaper() {

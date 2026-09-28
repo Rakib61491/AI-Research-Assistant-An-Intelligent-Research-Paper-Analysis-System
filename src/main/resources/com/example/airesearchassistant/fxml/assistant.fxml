@@ -17,8 +17,12 @@
               style="-fx-background-color: #f38ba8; -fx-padding: 12 18; -fx-background-radius: 8;">
             <Label text="⚠️ Ollama is not reachable."
                    style="-fx-font-weight: bold; -fx-text-fill: #11111b; -fx-font-size: 13px;" />
-            <Label text="Install Ollama from ollama.com, run `ollama pull llama3.2`, then Test Connection in Settings."
-                   style="-fx-text-fill: #11111b; -fx-font-size: 13px;" />
+            <Label fx:id="offlineBannerDetailLabel"
+                   text="Make sure Ollama is running, then click Reconnect or go to Settings → Test Connection."
+                   style="-fx-text-fill: #11111b; -fx-font-size: 13px;" HBox.hgrow="ALWAYS" />
+            <Button text="🔄 Reconnect" onAction="#handleReconnect"
+                    style="-fx-background-color: #11111b; -fx-text-fill: #f38ba8; -fx-font-weight: bold;
+                           -fx-padding: 6 14; -fx-background-radius: 6; -fx-cursor: hand;" />
         </HBox>
 
         <!-- Main Split / Workspace Layout -->

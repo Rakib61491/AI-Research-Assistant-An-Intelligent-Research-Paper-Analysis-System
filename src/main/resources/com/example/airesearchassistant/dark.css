@@ -169,10 +169,156 @@
     -fx-text-fill: #cdd6f4;
     -fx-prompt-text-fill: #6c7086;
     -fx-border-color: #45475a;
+    -fx-highlight-fill: #89b4fa;
+    -fx-highlight-text-fill: #11111b;
 }
 
 .form-input:focused {
     -fx-border-color: #89b4fa;
+}
+
+/* ---- TextArea inner node overrides (dark mode) ---- */
+/* JavaFX TextArea wraps its content in sub-nodes that do NOT inherit
+   -fx-text-fill from the outer .form-input class. These explicit rules
+   force dark background and light text inside every TextArea. */
+.text-area {
+    -fx-background-color: #1e1e2e;
+    -fx-text-fill: #cdd6f4;
+    -fx-control-inner-background: #1e1e2e;
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: #89b4fa;
+}
+
+.text-area .content {
+    -fx-background-color: #1e1e2e;
+    -fx-text-fill: #cdd6f4;
+    -fx-control-inner-background: #1e1e2e;
+}
+
+.text-area .scroll-pane {
+    -fx-background-color: #1e1e2e;
+}
+
+.text-area .scroll-pane .viewport {
+    -fx-background-color: #1e1e2e;
+}
+
+.text-area .scroll-pane .corner {
+    -fx-background-color: #1e1e2e;
+}
+
+/* ---- TextField inner node overrides (dark mode) ---- */
+.text-field {
+    -fx-text-fill: #cdd6f4;
+    -fx-control-inner-background: #1e1e2e;
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: #89b4fa;
+    -fx-background-color: #1e1e2e;
+    -fx-prompt-text-fill: #6c7086;
+}
+
+/* ---- Spinner inner editor (dark mode) ---- */
+.spinner .text-field {
+    -fx-text-fill: #cdd6f4;
+    -fx-background-color: #313244;
+}
+
+/* ---- ComboBox inner editor (dark mode) ---- */
+.combo-box {
+    -fx-background-color: #313244;
+    -fx-border-color: #45475a;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #313244;
+    -fx-border-color: #45475a;
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #45475a;
+}
+
+.combo-box-popup .list-view .list-cell:selected {
+    -fx-background-color: #89b4fa;
+    -fx-text-fill: #11111b;
+}
+
+.combo-box .text-field {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+    -fx-prompt-text-fill: #6c7086;
+}
+
+/* ---- ScrollPane inner node overrides (dark mode) ---- */
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+/* ---- ListView inner node dark mode ---- */
+.styled-list-view .list-cell {
+    -fx-background-color: #1e1e2e;
+    -fx-text-fill: #cdd6f4;
+}
+
+.styled-list-view .list-cell:odd {
+    -fx-background-color: #242538;
+}
+
+.styled-list-view .list-cell:hover {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+}
+
+.styled-list-view .list-cell:selected {
+    -fx-background-color: #45475a;
+    -fx-text-fill: #89b4fa;
+}
+
+/* ---- Slider dark mode ---- */
+.slider .track {
+    -fx-background-color: #45475a;
+}
+
+.slider .thumb {
+    -fx-background-color: #89b4fa;
+}
+
+/* ---- ChoiceBox dark mode ---- */
+.choice-box {
+    -fx-background-color: #313244;
+    -fx-border-color: #45475a;
+    -fx-text-fill: #cdd6f4;
+}
+
+.choice-box .label {
+    -fx-text-fill: #cdd6f4;
+}
+
+.choice-box-popup .menu-item .label {
+    -fx-text-fill: #cdd6f4;
+}
+
+/* ---- ProgressBar dark mode ---- */
+.progress-bar .track {
+    -fx-background-color: #313244;
+}
+
+.progress-bar .bar {
+    -fx-background-color: #89b4fa;
 }
 
 /* ---- Buttons ---- */
@@ -289,12 +435,27 @@
     -fx-border-color: transparent transparent #2a2a3e transparent;
 }
 
+/* Explicit white text for all table cells — JavaFX Text sub-nodes
+   don't inherit -fx-text-fill from row selectors without this. */
+.papers-table .table-row-cell .text {
+    -fx-fill: #cdd6f4;
+    -fx-font-size: 13px;
+}
+
 .papers-table .table-row-cell:odd {
     -fx-background-color: #242538;
 }
 
+.papers-table .table-row-cell:odd .text {
+    -fx-fill: #cdd6f4;
+}
+
 .papers-table .table-row-cell:hover {
     -fx-background-color: #313244;
+}
+
+.papers-table .table-row-cell:hover .text {
+    -fx-fill: #89b4fa;
 }
 
 .papers-table .table-row-cell:selected {
@@ -303,5 +464,6 @@
 
 .papers-table .table-row-cell:selected .text {
     -fx-fill: #89b4fa;
+    -fx-font-weight: bold;
 }
 

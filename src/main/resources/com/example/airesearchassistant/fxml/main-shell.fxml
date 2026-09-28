@@ -66,8 +66,6 @@
                             maxWidth="Infinity" styleClass="nav-button" />
                     <Button fx:id="navCollections" text="📁  Collections" onAction="#handleNavCollections"
                             maxWidth="Infinity" styleClass="nav-button" />
-                    <Button fx:id="navFavorites" text="⭐  Favorites" onAction="#handleNavFavorites"
-                            maxWidth="Infinity" styleClass="nav-button" />
                     <Button fx:id="navLab" text="🧪  JavaFX Lab" onAction="#handleNavLab"
                             maxWidth="Infinity" styleClass="nav-button" />
                     <Button fx:id="navSettings" text="⚙️  Settings" onAction="#handleNavSettings"

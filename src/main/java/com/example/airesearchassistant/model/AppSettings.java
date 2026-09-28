@@ -10,7 +10,7 @@ public class AppSettings {
     private String defaultModel = "llama3.2";
     private double temperature = 0.4;
     private int maxTokens = 800;
-    private int timeoutSeconds = 120;
+    private int timeoutSeconds = 300;  // 5 minutes — large models (e.g. qwen3:8b) need time to load
     private String theme = "dark";
 
     public AppSettings() {

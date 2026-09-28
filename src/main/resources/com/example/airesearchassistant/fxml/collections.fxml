@@ -11,7 +11,7 @@
            styleClass="page-scroll">
 
     <!-- LEFT: Collections List -->
-    <VBox spacing="0" style="-fx-background-color: #1e1e2e;">
+    <VBox spacing="0" styleClass="sidebar">
         <padding><Insets top="24" right="0" bottom="16" left="0"/></padding>
 
         <VBox spacing="6" style="-fx-padding: 0 16 12 16;">
@@ -49,7 +49,7 @@
     </VBox>
 
     <!-- RIGHT: Papers in Selected Collection -->
-    <VBox spacing="12" style="-fx-padding: 24 24 16 16; -fx-background-color: #181825;">
+    <VBox spacing="12" styleClass="page-container">
 
         <VBox spacing="4">
             <Label fx:id="collectionTitleLabel" text="Select a collection" styleClass="section-header" />
@@ -64,6 +64,9 @@
                 <TableColumn fx:id="colYear" text="Year" prefWidth="70" />
                 <TableColumn fx:id="colTopic" text="Topic" prefWidth="160" />
             </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
             <placeholder>
                 <Label text="No papers in this collection. Use 'Add Paper to Collection' below." style="-fx-text-fill: #6c7086; -fx-padding: 24;" />
             </placeholder>
