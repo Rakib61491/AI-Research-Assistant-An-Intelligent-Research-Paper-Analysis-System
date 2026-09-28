@@ -45,6 +45,16 @@ public class SettingsService {
         return client.listModels();
     }
 
+    /**
+     * Returns list of models suitable for text generation/chat (filtering out embedding models).
+     */
+    public List<String> fetchAvailableChatModels(String url) throws OllamaException {
+        List<String> all = fetchAvailableModels(url);
+        return all.stream()
+                .filter(m -> !m.toLowerCase().contains("embed"))
+                .toList();
+    }
+
     public OllamaService getOllamaService() {
         AppSettings current = getSettings();
         ollamaService.setBaseUrl(current.getOllamaUrl());

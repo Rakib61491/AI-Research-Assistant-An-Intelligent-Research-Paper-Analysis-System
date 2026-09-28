@@ -20,6 +20,7 @@ public class ResearchPaper {
     private String filePath;
     private String aiSummary;
     private String personalNotes;
+    private String extractedJson;
     private boolean isFavorite;
     private String dateAdded;
     private String dateAnalyzed;
@@ -79,6 +80,9 @@ public class ResearchPaper {
 
     public String getPersonalNotes() { return personalNotes; }
     public void setPersonalNotes(String personalNotes) { this.personalNotes = personalNotes; }
+
+    public String getExtractedJson() { return extractedJson; }
+    public void setExtractedJson(String extractedJson) { this.extractedJson = extractedJson; }
 
     public boolean isFavorite() { return isFavorite; }
     public void setFavorite(boolean favorite) { isFavorite = favorite; }

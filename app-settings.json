@@ -1,0 +1,8 @@
+{
+  "ollamaUrl" : "http://localhost:11434",
+  "defaultModel" : "qwen3:8b",
+  "temperature" : 0.4,
+  "maxTokens" : 800,
+  "timeoutSeconds" : 120,
+  "theme" : "dark"
+}

@@ -36,6 +36,10 @@ public final class SceneManager {
         this.shellController = shellController;
     }
 
+    public MainShellController getShellController() {
+        return shellController;
+    }
+
     /**
      * Loads the view at fxmlPath into the contentArea and updates the sidebar active state.
      *

@@ -44,6 +44,12 @@ public class PdfExtractionServiceTest {
         assertEquals("2023", data.publicationYear());
         assertTrue(data.abstractText().contains("comprehensive overview"));
         assertTrue(data.fullText().contains("Recent advances"));
+        assertNotNull(data.json());
+        assertTrue(data.json().contains("\"metadata\""));
+        assertTrue(data.json().contains("Deep Learning for Natural Language Processing"));
+        assertNotNull(data.markdown());
+        assertTrue(data.markdown().startsWith("# Deep Learning"));
+        assertFalse(data.sections().isEmpty());
     }
 
     @Test

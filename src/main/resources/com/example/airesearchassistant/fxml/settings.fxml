@@ -34,7 +34,7 @@
             <VBox spacing="6">
                 <Label text="Active Model" styleClass="form-label" />
                 <HBox spacing="12" alignment="CENTER_LEFT">
-                    <ComboBox fx:id="modelComboBox" prefWidth="380" promptText="Select an Ollama model..." styleClass="filter-combo" />
+                    <ComboBox fx:id="modelComboBox" editable="true" prefWidth="380" promptText="Select or type an Ollama model..." styleClass="filter-combo" />
                     <Button fx:id="refreshModelsButton" text="↻ Refresh Models" onAction="#handleRefreshModels" styleClass="secondary-btn" />
                     <ProgressIndicator fx:id="modelLoadingIndicator" prefWidth="20" prefHeight="20" visible="false" />
                 </HBox>

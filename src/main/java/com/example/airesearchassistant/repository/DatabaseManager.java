@@ -74,7 +74,8 @@ public final class DatabaseManager {
                     personal_notes TEXT,
                     is_favorite INTEGER NOT NULL DEFAULT 0,
                     date_added TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    date_analyzed TEXT
+                    date_analyzed TEXT,
+                    extracted_json TEXT
                 );
                 """;
 
@@ -109,6 +110,14 @@ public final class DatabaseManager {
             stmt.execute(createCollectionsTable);
             stmt.execute(createPaperCollectionsTable);
             stmt.execute(createSettingsTable);
+
+            // Migration: ensure extracted_json column exists in legacy databases
+            try {
+                stmt.execute("ALTER TABLE papers ADD COLUMN extracted_json TEXT;");
+            } catch (SQLException ignored) {
+                // Column already exists
+            }
+
             System.out.println("SQLite database schema initialized at " + dbUrl);
         } catch (SQLException e) {
             System.err.println("Failed to initialize database schema: " + e.getMessage());

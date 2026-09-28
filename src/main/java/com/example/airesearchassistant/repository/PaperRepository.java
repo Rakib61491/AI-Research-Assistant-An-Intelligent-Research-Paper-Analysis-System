@@ -35,8 +35,8 @@ public class PaperRepository {
                 INSERT INTO papers (
                     title, authors, publication_year, journal, doi,
                     abstract_text, methodology, findings, keywords, topic,
-                    file_path, ai_summary, personal_notes, is_favorite, date_analyzed
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                    file_path, ai_summary, personal_notes, is_favorite, date_analyzed, extracted_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                 """;
 
         try (Connection conn = databaseManager.getConnection();
@@ -57,6 +57,7 @@ public class PaperRepository {
             ps.setString(13, paper.getPersonalNotes());
             ps.setInt(14, paper.isFavorite() ? 1 : 0);
             ps.setString(15, paper.getDateAnalyzed());
+            ps.setString(16, paper.getExtractedJson());
 
             ps.executeUpdate();
 
@@ -79,7 +80,8 @@ public class PaperRepository {
                 UPDATE papers SET
                     title = ?, authors = ?, publication_year = ?, journal = ?, doi = ?,
                     abstract_text = ?, methodology = ?, findings = ?, keywords = ?, topic = ?,
-                    file_path = ?, ai_summary = ?, personal_notes = ?, is_favorite = ?, date_analyzed = ?
+                    file_path = ?, ai_summary = ?, personal_notes = ?, is_favorite = ?, date_analyzed = ?,
+                    extracted_json = ?
                 WHERE id = ?;
                 """;
 
@@ -101,7 +103,8 @@ public class PaperRepository {
             ps.setString(13, paper.getPersonalNotes());
             ps.setInt(14, paper.isFavorite() ? 1 : 0);
             ps.setString(15, paper.getDateAnalyzed());
-            ps.setInt(16, paper.getId());
+            ps.setString(16, paper.getExtractedJson());
+            ps.setInt(17, paper.getId());
 
             return ps.executeUpdate() > 0;
         }
@@ -299,6 +302,9 @@ public class PaperRepository {
         paper.setFavorite(rs.getInt("is_favorite") == 1);
         paper.setDateAdded(rs.getString("date_added"));
         paper.setDateAnalyzed(rs.getString("date_analyzed"));
+        try {
+            paper.setExtractedJson(rs.getString("extracted_json"));
+        } catch (SQLException ignored) {}
         return paper;
     }
 }

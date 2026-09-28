@@ -65,24 +65,45 @@ public class SettingsRepository {
 
     public AppSettings loadSettings() {
         AppSettings settings = new AppSettings();
+        // 1. Try to load from project-level app-settings.json first
+        File projectConfigFile = new File("app-settings.json");
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        if (projectConfigFile.exists() && projectConfigFile.isFile() && projectConfigFile.length() > 0) {
+            try {
+                AppSettings fileSettings = mapper.readValue(projectConfigFile, AppSettings.class);
+                if (fileSettings != null && fileSettings.getDefaultModel() != null && !fileSettings.getDefaultModel().isBlank()) {
+                    settings = fileSettings;
+                }
+            } catch (Exception e) {
+                System.err.println("Could not parse project app-settings.json: " + e.getMessage());
+            }
+        }
+
+        // 2. Read / overlay from SQLite settings table
         try {
-            settings.setOllamaUrl(get("ollama_url", "http://localhost:11434"));
-            settings.setDefaultModel(get("default_model", "llama3.2"));
-            String tempStr = get("temperature", "0.4");
-            try {
-                settings.setTemperature(Double.parseDouble(tempStr));
-            } catch (NumberFormatException ignored) {}
+            String dbOllamaUrl = get("ollama_url", null);
+            if (dbOllamaUrl != null && !dbOllamaUrl.isBlank()) settings.setOllamaUrl(dbOllamaUrl);
 
-            String maxTokensStr = get("max_tokens", "800");
-            try {
-                settings.setMaxTokens(Integer.parseInt(maxTokensStr));
-            } catch (NumberFormatException ignored) {}
+            String dbModel = get("default_model", null);
+            if (dbModel != null && !dbModel.isBlank()) settings.setDefaultModel(dbModel);
 
-            String timeout = get("timeout_seconds", "120");
-            try {
-                settings.setTimeoutSeconds(Integer.parseInt(timeout));
-            } catch (NumberFormatException ignored) {}
-            settings.setTheme(get("theme", "dark"));
+            String tempStr = get("temperature", null);
+            if (tempStr != null) {
+                try { settings.setTemperature(Double.parseDouble(tempStr)); } catch (NumberFormatException ignored) {}
+            }
+
+            String maxTokensStr = get("max_tokens", null);
+            if (maxTokensStr != null) {
+                try { settings.setMaxTokens(Integer.parseInt(maxTokensStr)); } catch (NumberFormatException ignored) {}
+            }
+
+            String timeout = get("timeout_seconds", null);
+            if (timeout != null) {
+                try { settings.setTimeoutSeconds(Integer.parseInt(timeout)); } catch (NumberFormatException ignored) {}
+            }
+
+            String theme = get("theme", null);
+            if (theme != null && !theme.isBlank()) settings.setTheme(theme);
         } catch (SQLException e) {
             System.err.println("Could not load settings from database: " + e.getMessage());
         }
@@ -90,11 +111,23 @@ public class SettingsRepository {
     }
 
     public void saveSettings(AppSettings settings) throws SQLException {
+        if (settings == null) return;
+
+        // Persist to database
         set("ollama_url", settings.getOllamaUrl());
         set("default_model", settings.getDefaultModel());
         set("temperature", String.valueOf(settings.getTemperature()));
         set("max_tokens", String.valueOf(settings.getMaxTokens()));
         set("timeout_seconds", String.valueOf(settings.getTimeoutSeconds()));
         set("theme", settings.getTheme());
+
+        // Also permanently save to project-level app-settings.json
+        try {
+            File projectConfigFile = new File("app-settings.json");
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            mapper.writerWithDefaultPrettyPrinter().writeValue(projectConfigFile, settings);
+        } catch (Exception e) {
+            System.err.println("Could not write project app-settings.json: " + e.getMessage());
+        }
     }
 }

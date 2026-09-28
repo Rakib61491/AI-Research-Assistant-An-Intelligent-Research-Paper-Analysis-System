@@ -260,4 +260,12 @@ public class MainShellController {
             ollamaStatusDot.setStyle(connected ? "-fx-fill: #a6e3a1;" : "-fx-fill: #f38ba8;");
         }
     }
+
+    public void refreshSettings() {
+        AppSettings settings = settingsService.getSettings();
+        if (ollamaModelLabel != null) {
+            ollamaModelLabel.setText(settings.getDefaultModel());
+        }
+        checkOllamaAsync(settings);
+    }
 }

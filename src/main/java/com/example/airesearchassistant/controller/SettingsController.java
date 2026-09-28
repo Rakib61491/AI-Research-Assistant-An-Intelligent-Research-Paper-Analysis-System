@@ -61,6 +61,9 @@ public class SettingsController {
         }
 
         loadSavedSettings();
+
+        // Automatically fetch models on startup so user sees installed Ollama models immediately
+        Platform.runLater(this::handleRefreshModels);
     }
 
     private void loadSavedSettings() {
@@ -68,10 +71,17 @@ public class SettingsController {
 
         if (ollamaUrlField != null) ollamaUrlField.setText(settings.getOllamaUrl());
         if (modelComboBox != null) {
-            if (!modelComboBox.getItems().contains(settings.getDefaultModel())) {
-                modelComboBox.getItems().add(settings.getDefaultModel());
+            modelComboBox.setEditable(true);
+            String savedModel = settings.getDefaultModel();
+            if (savedModel != null && !savedModel.isBlank()) {
+                if (!modelComboBox.getItems().contains(savedModel)) {
+                    modelComboBox.getItems().add(savedModel);
+                }
+                modelComboBox.setValue(savedModel);
+                if (modelComboBox.getEditor() != null) {
+                    modelComboBox.getEditor().setText(savedModel);
+                }
             }
-            modelComboBox.setValue(settings.getDefaultModel());
         }
         if (temperatureSlider != null) {
             temperatureSlider.setValue(settings.getTemperature());
@@ -152,6 +162,10 @@ public class SettingsController {
         Task<List<String>> modelsTask = new Task<>() {
             @Override
             protected List<String> call() throws Exception {
+                try {
+                    List<String> chatModels = settingsService.fetchAvailableChatModels(url);
+                    if (!chatModels.isEmpty()) return chatModels;
+                } catch (Exception ignored) {}
                 return settingsService.fetchAvailableModels(url);
             }
         };
@@ -160,20 +174,46 @@ public class SettingsController {
             if (modelLoadingIndicator != null) modelLoadingIndicator.setVisible(false);
             List<String> models = modelsTask.getValue();
             if (modelComboBox != null) {
-                String previous = modelComboBox.getValue();
+                modelComboBox.setEditable(true);
+                String current = "";
+                if (modelComboBox.getEditor() != null && !modelComboBox.getEditor().getText().isBlank()) {
+                    current = modelComboBox.getEditor().getText().trim();
+                } else if (modelComboBox.getValue() != null) {
+                    current = modelComboBox.getValue().trim();
+                }
+
                 modelComboBox.getItems().clear();
                 if (models.isEmpty()) {
-                    modelComboBox.getItems().add("llama3.2");
+                    if (current != null && !current.isBlank()) {
+                        modelComboBox.getItems().add(current);
+                    } else {
+                        modelComboBox.getItems().add("llama3.2");
+                    }
                     if (connectionStatusLabel != null) {
-                        connectionStatusLabel.setText("✓ Connected, but no models found. Run `ollama pull llama3.2`.");
+                        connectionStatusLabel.setText("✓ Connected, but no models found. Run `ollama pull <model>`.");
                     }
                 } else {
                     modelComboBox.getItems().addAll(models);
+                    if (connectionStatusLabel != null && !connectionStatusLabel.getText().startsWith("✗")) {
+                        connectionStatusLabel.setText("✓ Ollama connected (" + models.size() + " models available)");
+                        connectionStatusLabel.setStyle("-fx-text-fill: #a6e3a1; -fx-font-weight: bold;");
+                    }
                 }
-                if (previous != null && modelComboBox.getItems().contains(previous)) {
-                    modelComboBox.setValue(previous);
+
+                // If user had a selected/typed model, preserve it!
+                if (!current.isBlank()) {
+                    if (!modelComboBox.getItems().contains(current)) {
+                        modelComboBox.getItems().add(0, current);
+                    }
+                    modelComboBox.setValue(current);
+                    if (modelComboBox.getEditor() != null) {
+                        modelComboBox.getEditor().setText(current);
+                    }
                 } else if (!modelComboBox.getItems().isEmpty()) {
                     modelComboBox.setValue(modelComboBox.getItems().get(0));
+                    if (modelComboBox.getEditor() != null) {
+                        modelComboBox.getEditor().setText(modelComboBox.getItems().get(0));
+                    }
                 }
             }
         });
@@ -182,8 +222,8 @@ public class SettingsController {
             if (modelLoadingIndicator != null) modelLoadingIndicator.setVisible(false);
             Throwable ex = modelsTask.getException();
             String msg = (ex instanceof OllamaException) ? ex.getMessage() : "Could not retrieve models.";
-            if (connectionStatusLabel != null) {
-                connectionStatusLabel.setText("Failed to list models: " + msg);
+            if (connectionStatusLabel != null && !connectionStatusLabel.getText().startsWith("✓")) {
+                connectionStatusLabel.setText("Status: " + msg);
             }
         });
 
@@ -200,9 +240,17 @@ public class SettingsController {
             return;
         }
 
-        String model = modelComboBox != null && modelComboBox.getValue() != null
-                ? modelComboBox.getValue().trim()
-                : "llama3.2";
+        String model = "";
+        if (modelComboBox != null) {
+            if (modelComboBox.getEditor() != null && !modelComboBox.getEditor().getText().isBlank()) {
+                model = modelComboBox.getEditor().getText().trim();
+            } else if (modelComboBox.getValue() != null) {
+                model = modelComboBox.getValue().trim();
+            }
+        }
+        if (model.isBlank()) {
+            model = "llama3.2";
+        }
 
         double temp = temperatureSlider != null ? temperatureSlider.getValue() : 0.4;
         int maxTokens = (maxTokensSpinner != null && maxTokensSpinner.getValue() != null)
@@ -227,11 +275,18 @@ public class SettingsController {
         AppSettings settings = new AppSettings(url, model, temp, maxTokens, timeout, theme);
         try {
             settingsService.saveSettings(settings);
+
+            // Immediately notify main shell to update active model badge and connectivity indicator
+            MainShellController shell = SceneManager.getInstance().getShellController();
+            if (shell != null) {
+                shell.refreshSettings();
+            }
+
             if (settingsStatusLabel != null) {
-                settingsStatusLabel.setText("Settings saved successfully.");
+                settingsStatusLabel.setText("Settings saved successfully (Model: " + model + ").");
             }
             AlertUtil.showInfo("Settings Saved", "Configuration Saved",
-                    "Application configuration has been updated and persisted to database.");
+                    "Application configuration has been updated and permanently saved to project.\nActive Model: " + model);
         } catch (SQLException e) {
             AlertUtil.showError("Database Error", "Failed to save settings", e.getMessage());
         }
