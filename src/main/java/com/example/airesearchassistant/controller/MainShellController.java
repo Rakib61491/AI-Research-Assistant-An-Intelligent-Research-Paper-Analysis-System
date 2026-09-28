@@ -82,7 +82,7 @@ public class MainShellController {
         pageTitleMap.put(Constants.FXML_COLLECTIONS, "Paper Collections");
         pageTitleMap.put(Constants.FXML_SETTINGS, "Application Settings");
         pageTitleMap.put(Constants.FXML_ABOUT, "About AI Research Assistant");
-        pageTitleMap.put(Constants.FXML_LAB_VIEW, "JavaFX Lab Exercises (B1–B6, C1–C20)");
+        pageTitleMap.put(Constants.FXML_LAB_VIEW, "Interactive JavaFX & Multithreading Lab");
 
         setupTooltips();
 
@@ -120,7 +120,7 @@ public class MainShellController {
         if (navAssistant != null) navAssistant.setTooltip(new Tooltip("AI summarization, extraction, and Q&A chat"));
         if (navComparison != null) navComparison.setTooltip(new Tooltip("Compare two papers with local similarity & AI"));
         if (navCollections != null) navCollections.setTooltip(new Tooltip("Organize papers into custom collections"));
-        if (navLab != null) navLab.setTooltip(new Tooltip("JavaFX Lab demo exercises (B1–B6, C1–C20)"));
+        if (navLab != null) navLab.setTooltip(new Tooltip("Interactive JavaFX control and multithreading demonstrations"));
         if (navSettings != null) navSettings.setTooltip(new Tooltip("Configure Ollama endpoint and AI parameters"));
         if (navAbout != null) navAbout.setTooltip(new Tooltip("About AI Research Assistant"));
     }

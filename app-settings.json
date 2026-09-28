@@ -1,8 +1,8 @@
 {
   "ollamaUrl" : "http://localhost:11434",
   "defaultModel" : "smollm2:1.7b",
-  "temperature" : 0.19955620737470822,
-  "maxTokens" : 600,
+  "temperature" : 0.30614255918951394,
+  "maxTokens" : 650,
   "timeoutSeconds" : 600,
   "theme" : "dark"
 }

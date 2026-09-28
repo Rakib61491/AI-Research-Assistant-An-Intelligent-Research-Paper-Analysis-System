@@ -542,3 +542,210 @@
     -fx-text-fill: #343a40;
 }
 
+/* Lab navigation stays a high-contrast white surface in either theme. */
+.research-lab .lab-navigation-choice {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #64748b;
+    -fx-text-fill: #111827;
+}
+
+.research-lab .lab-navigation-choice .label,
+.research-lab .lab-navigation-choice .text,
+.research-lab .lab-navigation-choice .context-menu .label {
+    -fx-text-fill: #111827;
+    -fx-fill: #111827;
+}
+
+.research-lab .lab-navigation-choice .context-menu,
+.research-lab .lab-navigation-choice .menu-item {
+    -fx-background-color: #ffffff;
+}
+
+.research-lab .lab-demo-list {
+    -fx-background-color: #ffffff;
+    -fx-control-inner-background: #ffffff;
+    -fx-border-color: #cbd5e1;
+}
+
+.research-lab .lab-demo-list .list-cell {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #111827;
+}
+
+.research-lab .lab-demo-list .list-cell .text {
+    -fx-fill: #111827;
+}
+
+.research-lab .lab-demo-list .list-cell:selected {
+    -fx-background-color: #bfdbfe;
+    -fx-text-fill: #111827;
+}
+
+.research-lab .lab-demo-list .list-cell:selected .text {
+    -fx-fill: #111827;
+    -fx-font-weight: bold;
+}
+
+.research-lab .lab-demo-card {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-text-fill: #111827;
+}
+
+.research-lab .lab-demo-card .label,
+.research-lab .lab-demo-card .radio-button,
+.research-lab .lab-demo-card .check-box,
+.research-lab .lab-demo-card .tree-cell {
+    -fx-text-fill: #111827;
+}
+
+.research-lab .lab-demo-card .label .text,
+.research-lab .lab-demo-card .radio-button .text,
+.research-lab .lab-demo-card .check-box .text,
+.research-lab .lab-demo-card .tree-cell .text {
+    -fx-fill: #111827;
+}
+
+.research-lab .lab-demo-card .lab-demo-result {
+    -fx-text-fill: #075985;
+    -fx-font-weight: bold;
+}
+
+.research-lab .lab-demo-card .text-field,
+.research-lab .lab-demo-card .text-area,
+.research-lab .lab-demo-card .text-area .content,
+.research-lab .lab-demo-card .spinner .text-field,
+.research-lab .lab-demo-card .combo-box,
+.research-lab .lab-demo-card .combo-box .text-field,
+.research-lab .lab-demo-card .combo-box .list-cell,
+.research-lab .lab-demo-card .choice-box,
+.research-lab .lab-demo-card .date-picker,
+.research-lab .lab-demo-card .date-picker .text-field {
+    -fx-background-color: #ffffff;
+    -fx-control-inner-background: #ffffff;
+    -fx-text-fill: #111827;
+    -fx-prompt-text-fill: #475569;
+    -fx-border-color: #64748b;
+}
+
+.research-lab .lab-demo-card .combo-box-popup .list-view,
+.research-lab .lab-demo-card .combo-box-popup .list-cell,
+.research-lab .lab-demo-card .choice-box .context-menu,
+.research-lab .lab-demo-card .choice-box .menu-item {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #111827;
+}
+
+.research-lab .lab-demo-card .combo-box-popup .list-cell .text,
+.research-lab .lab-demo-card .choice-box .menu-item .label {
+    -fx-fill: #111827;
+    -fx-text-fill: #111827;
+}
+
+.research-lab .lab-demo-card .list-view,
+.research-lab .lab-demo-card .tree-view {
+    -fx-background-color: #ffffff;
+    -fx-control-inner-background: #ffffff;
+    -fx-border-color: #cbd5e1;
+}
+
+.research-lab .lab-demo-card .list-cell,
+.research-lab .lab-demo-card .tree-cell {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #111827;
+}
+
+.research-lab .lab-demo-card .list-cell .text,
+.research-lab .lab-demo-card .tree-cell .text {
+    -fx-fill: #111827;
+}
+
+.research-lab .lab-demo-card .list-cell:selected,
+.research-lab .lab-demo-card .tree-cell:selected {
+    -fx-background-color: #bfdbfe;
+    -fx-text-fill: #111827;
+}
+
+.research-lab .lab-demo-card .list-cell:selected .text,
+.research-lab .lab-demo-card .tree-cell:selected .text {
+    -fx-fill: #111827;
+}
+
+.research-lab .lab-demo-card .text-area .content,
+.research-lab .lab-demo-card .text-area .scroll-pane,
+.research-lab .lab-demo-card .text-area .scroll-pane .viewport {
+    -fx-background-color: #ffffff;
+}
+
+.research-lab .lab-demo-card .button {
+    -fx-background-color: #dbeafe;
+    -fx-border-color: #2563eb;
+    -fx-border-radius: 5;
+    -fx-text-fill: #111827;
+}
+
+.research-lab .lab-demo-card .button:hover {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: #ffffff;
+}
+
+.research-lab .lab-demo-card .button:hover .text {
+    -fx-fill: #ffffff;
+}
+
+.research-lab .lab-demo-card .progress-bar .track {
+    -fx-background-color: #dbeafe;
+}
+
+.research-lab .lab-demo-card .progress-bar .bar,
+.research-lab .lab-demo-card .slider .thumb {
+    -fx-background-color: #2563eb;
+}
+
+.research-lab .lab-demo-card .slider .track {
+    -fx-background-color: #94a3b8;
+}
+
+.research-lab .lab-demo-card .radio-button,
+.research-lab .lab-demo-card .check-box {
+    -fx-text-fill: #000000;
+}
+
+.research-lab .lab-demo-card .radio-button .text,
+.research-lab .lab-demo-card .check-box .text {
+    -fx-fill: #000000;
+}
+
+.research-lab .lab-demo-card .choice-box .label,
+.research-lab .lab-demo-card .choice-box .context-menu .label {
+    -fx-text-fill: #000000;
+    -fx-fill: #000000;
+}
+
+.research-lab .lab-demo-card .password-field {
+    -fx-background-color: #ffffff;
+    -fx-control-inner-background: #ffffff;
+    -fx-text-fill: #111827;
+    -fx-prompt-text-fill: #475569;
+    -fx-border-color: #111827;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 4;
+}
+
+.research-lab .lab-demo-card .lab-category-radio,
+.research-lab .lab-demo-card .lab-paper-property-checkbox,
+.research-lab .lab-demo-card .lab-category-radio .text,
+.research-lab .lab-demo-card .lab-paper-property-checkbox .text {
+    -fx-text-fill: #000000;
+    -fx-fill: #000000;
+}
+
+.research-lab .lab-demo-card .lab-api-key-field {
+    -fx-background-color: #ffffff;
+    -fx-control-inner-background: #ffffff;
+    -fx-text-fill: #111827;
+    -fx-prompt-text-fill: #475569;
+    -fx-border-color: #000000;
+    -fx-border-width: 2;
+    -fx-border-radius: 4;
+}

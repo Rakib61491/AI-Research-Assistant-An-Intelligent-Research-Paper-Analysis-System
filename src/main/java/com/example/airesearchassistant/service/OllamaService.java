@@ -132,6 +132,7 @@ public class OllamaService {
             root.put("model", model);
             root.put("prompt", prompt);
             root.put("stream", true);
+            root.put("think", false);
 
             ObjectNode options = root.putObject("options");
             options.put("temperature", temperature);
@@ -213,6 +214,7 @@ public class OllamaService {
             ObjectNode root = objectMapper.createObjectNode();
             root.put("model", model);
             root.put("stream", true);
+            root.put("think", false);
 
             ArrayNode messagesArray = root.putArray("messages");
             for (ChatMessage msg : messages) {

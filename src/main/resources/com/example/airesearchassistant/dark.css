@@ -467,3 +467,242 @@
     -fx-font-weight: bold;
 }
 
+/* Keep Lab navigation intentionally white with black text in dark mode too. */
+.research-lab .lab-navigation-choice {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #64748b;
+    -fx-text-fill: #111827;
+}
+
+.research-lab .lab-navigation-choice .label,
+.research-lab .lab-navigation-choice .text,
+.research-lab .lab-navigation-choice .context-menu .label {
+    -fx-text-fill: #111827;
+    -fx-fill: #111827;
+}
+
+.research-lab .lab-navigation-choice .context-menu,
+.research-lab .lab-navigation-choice .menu-item {
+    -fx-background-color: #ffffff;
+}
+
+.research-lab .lab-demo-list {
+    -fx-background-color: #ffffff;
+    -fx-control-inner-background: #ffffff;
+    -fx-border-color: #64748b;
+}
+
+.research-lab .lab-demo-list .list-cell {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #111827;
+}
+
+.research-lab .lab-demo-list .list-cell .text {
+    -fx-fill: #111827;
+}
+
+.research-lab .lab-demo-list .list-cell:selected {
+    -fx-background-color: #bfdbfe;
+    -fx-text-fill: #111827;
+}
+
+.research-lab .lab-demo-list .list-cell:selected .text {
+    -fx-fill: #111827;
+    -fx-font-weight: bold;
+}
+
+/* Dark demo cards use bright text on deep surfaces; results use vivid accents. */
+.research-lab .lab-demo-card {
+    -fx-background-color: #242538;
+    -fx-border-color: #64748b;
+    -fx-text-fill: #f8fafc;
+}
+
+.research-lab .lab-demo-card .label,
+.research-lab .lab-demo-card .radio-button,
+.research-lab .lab-demo-card .check-box,
+.research-lab .lab-demo-card .tree-cell {
+    -fx-text-fill: #f8fafc;
+}
+
+.research-lab .lab-demo-card .label .text,
+.research-lab .lab-demo-card .radio-button .text,
+.research-lab .lab-demo-card .check-box .text,
+.research-lab .lab-demo-card .tree-cell .text {
+    -fx-fill: #f8fafc;
+}
+
+.research-lab .lab-demo-card .lab-demo-result {
+    -fx-text-fill: #67e8f9;
+    -fx-font-weight: bold;
+}
+
+.research-lab .lab-demo-card .text-field,
+.research-lab .lab-demo-card .text-area,
+.research-lab .lab-demo-card .text-area .content,
+.research-lab .lab-demo-card .spinner .text-field,
+.research-lab .lab-demo-card .combo-box,
+.research-lab .lab-demo-card .combo-box .text-field,
+.research-lab .lab-demo-card .combo-box .list-cell,
+.research-lab .lab-demo-card .choice-box,
+.research-lab .lab-demo-card .date-picker,
+.research-lab .lab-demo-card .date-picker .text-field {
+    -fx-background-color: #111827;
+    -fx-control-inner-background: #111827;
+    -fx-text-fill: #f8fafc;
+    -fx-prompt-text-fill: #cbd5e1;
+    -fx-border-color: #94a3b8;
+}
+
+.research-lab .lab-demo-card .combo-box-popup .list-view,
+.research-lab .lab-demo-card .combo-box-popup .list-cell,
+.research-lab .lab-demo-card .choice-box .context-menu,
+.research-lab .lab-demo-card .choice-box .menu-item {
+    -fx-background-color: #111827;
+    -fx-text-fill: #f8fafc;
+}
+
+.research-lab .lab-demo-card .combo-box-popup .list-cell .text,
+.research-lab .lab-demo-card .choice-box .menu-item .label {
+    -fx-fill: #f8fafc;
+    -fx-text-fill: #f8fafc;
+}
+
+.research-lab .lab-demo-card .list-view,
+.research-lab .lab-demo-card .tree-view {
+    -fx-background-color: #111827;
+    -fx-control-inner-background: #111827;
+    -fx-border-color: #64748b;
+}
+
+.research-lab .lab-demo-card .list-cell,
+.research-lab .lab-demo-card .tree-cell {
+    -fx-background-color: #111827;
+    -fx-text-fill: #f8fafc;
+}
+
+.research-lab .lab-demo-card .list-cell .text,
+.research-lab .lab-demo-card .tree-cell .text {
+    -fx-fill: #f8fafc;
+}
+
+.research-lab .lab-demo-card .list-cell:selected,
+.research-lab .lab-demo-card .tree-cell:selected {
+    -fx-background-color: #1e3a5f;
+    -fx-text-fill: #ffffff;
+}
+
+.research-lab .lab-demo-card .list-cell:selected .text,
+.research-lab .lab-demo-card .tree-cell:selected .text {
+    -fx-fill: #ffffff;
+}
+
+.research-lab .lab-demo-card .text-area .content,
+.research-lab .lab-demo-card .text-area .scroll-pane,
+.research-lab .lab-demo-card .text-area .scroll-pane .viewport {
+    -fx-background-color: #111827;
+}
+
+.research-lab .lab-demo-card .button {
+    -fx-background-color: #1e40af;
+    -fx-border-color: #93c5fd;
+    -fx-border-radius: 5;
+    -fx-text-fill: #ffffff;
+}
+
+.research-lab .lab-demo-card .button .text {
+    -fx-fill: #ffffff;
+}
+
+.research-lab .lab-demo-card .button:hover {
+    -fx-background-color: #15803d;
+    -fx-border-color: #86efac;
+}
+
+.research-lab .lab-demo-card .progress-bar .track {
+    -fx-background-color: #334155;
+}
+
+.research-lab .lab-demo-card .progress-bar .bar,
+.research-lab .lab-demo-card .slider .thumb {
+    -fx-background-color: #38bdf8;
+}
+
+.research-lab .lab-demo-card .slider .track {
+    -fx-background-color: #64748b;
+}
+
+.research-lab .lab-demo-card .choice-box .label,
+.research-lab .lab-demo-card .choice-box .context-menu .label,
+.research-lab .lab-demo-card .choice-box .menu-item .label {
+    -fx-text-fill: #000000;
+    -fx-fill: #000000;
+}
+
+.research-lab .lab-demo-card .choice-box .context-menu,
+.research-lab .lab-demo-card .choice-box .menu-item {
+    -fx-background-color: #ffffff;
+}
+
+.research-lab .lab-demo-card .password-field {
+    -fx-background-color: #111827;
+    -fx-control-inner-background: #111827;
+    -fx-text-fill: #f8fafc;
+    -fx-prompt-text-fill: #cbd5e1;
+    -fx-border-color: #f8fafc;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 4;
+}
+
+.research-lab .lab-demo-card .lab-category-radio,
+.research-lab .lab-demo-card .lab-paper-property-checkbox,
+.research-lab .lab-demo-card .lab-category-radio .text,
+.research-lab .lab-demo-card .lab-paper-property-checkbox .text {
+    -fx-text-fill: #f8fafc;
+    -fx-fill: #f8fafc;
+}
+
+.research-lab .lab-demo-card .lab-publication-year-choice {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #111827;
+}
+
+.research-lab .lab-demo-card .lab-publication-year-choice .label,
+.research-lab .lab-demo-card .lab-publication-year-choice > .label,
+.research-lab .lab-demo-card .lab-publication-year-choice .text {
+    -fx-text-fill: #000000;
+    -fx-fill: #000000;
+}
+
+.research-lab .lab-demo-card .lab-publication-year-choice .context-menu,
+.research-lab .lab-demo-card .lab-publication-year-choice .menu-item {
+    -fx-background-color: #ffffff;
+}
+
+.research-lab .lab-demo-card .lab-publication-year-choice .menu-item .label,
+.research-lab .lab-demo-card .lab-publication-year-choice .menu-item .text {
+    -fx-text-fill: #000000;
+    -fx-fill: #000000;
+}
+
+.research-lab .lab-demo-card .lab-api-key-field {
+    -fx-background-color: #111827;
+    -fx-control-inner-background: #111827;
+    -fx-text-fill: #f8fafc;
+    -fx-prompt-text-fill: #cbd5e1;
+    -fx-border-color: #f8fafc;
+    -fx-border-width: 2;
+    -fx-border-radius: 4;
+}
+
+/* ChoiceBox uses a separate popup scene, so the Lab ancestor selector cannot reach it. */
+.choice-box-popup .menu-item,
+.choice-box-popup .menu-item:focused {
+    -fx-background-color: #ffffff;
+}
+
+.choice-box-popup .menu-item .label,
+.choice-box-popup .menu-item .label .text {
+    -fx-text-fill: #000000;
+    -fx-fill: #000000;
+}
