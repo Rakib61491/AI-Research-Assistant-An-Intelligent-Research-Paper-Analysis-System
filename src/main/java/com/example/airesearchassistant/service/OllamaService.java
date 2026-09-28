@@ -5,20 +5,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * OllamaService — Client service for local Ollama HTTP API (http://localhost:11434).
  * Uses Java 21 HttpClient and Jackson Databind.
+ * Supports token-by-token streaming inference and targeted research operations.
  * Contains no JavaFX/FXML references (Hard Rule 4).
  */
 public class OllamaService {
@@ -116,14 +122,16 @@ public class OllamaService {
     }
 
     /**
-     * Generates a completion via POST /api/generate with stream: false.
+     * Generates completion via POST /api/generate with streaming callback.
+     * Tokens are yielded to onToken as they arrive.
      */
-    public String generate(String model, String prompt, double temperature, int maxTokens, Duration timeout) throws OllamaException {
+    public String generateStream(String model, String prompt, double temperature, int maxTokens,
+                                 Duration timeout, Consumer<String> onToken) throws OllamaException {
         try {
             ObjectNode root = objectMapper.createObjectNode();
             root.put("model", model);
             root.put("prompt", prompt);
-            root.put("stream", false);
+            root.put("stream", true);
 
             ObjectNode options = root.putObject("options");
             options.put("temperature", temperature);
@@ -134,39 +142,77 @@ public class OllamaService {
             String requestBody = objectMapper.writeValueAsString(root);
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(baseUrl + "/api/generate"))
-                    .timeout(timeout != null ? timeout : Duration.ofSeconds(120))
+                    .timeout(timeout != null ? timeout : Duration.ofSeconds(300))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<InputStream> response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
             if (response.statusCode() != 200) {
-                throw new OllamaException("Ollama error (HTTP " + response.statusCode() + "): " + response.body());
+                String errBody = new String(response.body().readAllBytes(), StandardCharsets.UTF_8);
+                throw new OllamaException("Ollama error (HTTP " + response.statusCode() + "): " + errBody);
             }
 
-            JsonNode respNode = objectMapper.readTree(response.body());
-            JsonNode textNode = respNode.get("response");
-            return textNode != null ? textNode.asText() : "";
+            StringBuilder fullText = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(response.body(), StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (Thread.currentThread().isInterrupted()) {
+                        break;
+                    }
+                    if (line.trim().isEmpty()) continue;
+                    try {
+                        JsonNode node = objectMapper.readTree(line);
+                        String token = node.path("response").asText("");
+                        // Handle thinking models (e.g. deepseek-r1, qwen3)
+                        if (token.isEmpty() && node.has("thinking")) {
+                            token = node.path("thinking").asText("");
+                        }
+                        if (!token.isEmpty()) {
+                            fullText.append(token);
+                            if (onToken != null) {
+                                onToken.accept(token);
+                            }
+                        }
+                        if (node.path("done").asBoolean(false)) {
+                            break;
+                        }
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+            return fullText.toString();
         } catch (ConnectException e) {
             throw new OllamaException("Cannot connect to Ollama at " + baseUrl + ". Please verify Ollama is running.", e);
         } catch (HttpTimeoutException e) {
             throw new OllamaException(
-                "Ollama generation timed out after " + (timeout != null ? timeout.getSeconds() : 120) + "s.\n" +
+                "Ollama generation timed out after " + (timeout != null ? timeout.getSeconds() : 300) + "s.\n" +
                 "The model '" + model + "' may need more time to load or generate.\n" +
                 "Go to Settings and increase the Timeout (seconds) value.", e);
         } catch (IOException | InterruptedException e) {
+            if (Thread.currentThread().isInterrupted()) {
+                return "";
+            }
             throw new OllamaException("Error during Ollama generation: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Executes multi-turn conversation via POST /api/chat with stream: false.
+     * Synchronous generate wrapper.
      */
-    public String chat(String model, List<ChatMessage> messages, double temperature, int maxTokens, Duration timeout) throws OllamaException {
+    public String generate(String model, String prompt, double temperature, int maxTokens, Duration timeout) throws OllamaException {
+        return generateStream(model, prompt, temperature, maxTokens, timeout, null);
+    }
+
+    /**
+     * Executes multi-turn conversation via POST /api/chat with streaming callback.
+     */
+    public String chatStream(String model, List<ChatMessage> messages, double temperature, int maxTokens,
+                             Duration timeout, Consumer<String> onToken) throws OllamaException {
         try {
             ObjectNode root = objectMapper.createObjectNode();
             root.put("model", model);
-            root.put("stream", false);
+            root.put("stream", true);
 
             ArrayNode messagesArray = root.putArray("messages");
             for (ChatMessage msg : messages) {
@@ -184,67 +230,123 @@ public class OllamaService {
             String requestBody = objectMapper.writeValueAsString(root);
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(baseUrl + "/api/chat"))
-                    .timeout(timeout != null ? timeout : Duration.ofSeconds(120))
+                    .timeout(timeout != null ? timeout : Duration.ofSeconds(300))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<InputStream> response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
             if (response.statusCode() != 200) {
-                throw new OllamaException("Ollama error (HTTP " + response.statusCode() + "): " + response.body());
+                String errBody = new String(response.body().readAllBytes(), StandardCharsets.UTF_8);
+                throw new OllamaException("Ollama error (HTTP " + response.statusCode() + "): " + errBody);
             }
 
-            JsonNode respNode = objectMapper.readTree(response.body());
-            JsonNode msgNode = respNode.path("message").path("content");
-            return msgNode.isMissingNode() ? "" : msgNode.asText();
+            StringBuilder fullText = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(response.body(), StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (Thread.currentThread().isInterrupted()) {
+                        break;
+                    }
+                    if (line.trim().isEmpty()) continue;
+                    try {
+                        JsonNode node = objectMapper.readTree(line);
+                        String token = node.path("message").path("content").asText("");
+                        // Handle thinking models
+                        if (token.isEmpty() && node.path("message").has("thinking")) {
+                            token = node.path("message").path("thinking").asText("");
+                        }
+                        if (!token.isEmpty()) {
+                            fullText.append(token);
+                            if (onToken != null) {
+                                onToken.accept(token);
+                            }
+                        }
+                        if (node.path("done").asBoolean(false)) {
+                            break;
+                        }
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+            return fullText.toString();
         } catch (ConnectException e) {
             throw new OllamaException("Cannot connect to Ollama at " + baseUrl + ". Please verify Ollama is running.", e);
         } catch (HttpTimeoutException e) {
             throw new OllamaException(
-                "Ollama chat timed out after " + (timeout != null ? timeout.getSeconds() : 120) + "s.\n" +
+                "Ollama chat timed out after " + (timeout != null ? timeout.getSeconds() : 300) + "s.\n" +
                 "The model '" + model + "' may need more time to load or generate.\n" +
                 "Go to Settings and increase the Timeout (seconds) value.", e);
         } catch (IOException | InterruptedException e) {
+            if (Thread.currentThread().isInterrupted()) {
+                return "";
+            }
             throw new OllamaException("Error during Ollama chat: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Synchronous chat wrapper.
+     */
+    public String chat(String model, List<ChatMessage> messages, double temperature, int maxTokens, Duration timeout) throws OllamaException {
+        return chatStream(model, messages, temperature, maxTokens, timeout, null);
     }
 
     // ----- Section 7 Contract: Specialized Research AI Methods ---------------
 
     /**
-     * Generates a structured 7-section paper summary.
+     * Generates a structured 7-section paper summary with token streaming.
      */
-    public String summarize(String paperText, String model, double temperature, int maxTokens, Duration timeout) throws OllamaException {
-        String systemPrompt = "You are a research paper analysis assistant. Read the following paper text and produce " +
-                "a structured summary with these sections: Research Problem, Objectives, Methodology, Main Findings, " +
-                "Contributions, Limitations, Future Work. Use plain text. Do not invent facts not present in the text. " +
+    public String summarizeStream(String paperText, String model, double temperature, int maxTokens,
+                                  Duration timeout, Consumer<String> onToken) throws OllamaException {
+        String systemPrompt = "You are a research paper analysis assistant. Read the provided structured paper context and produce " +
+                "a clear, structured summary with these 7 sections:\n" +
+                "1. Research Problem\n" +
+                "2. Objectives\n" +
+                "3. Methodology\n" +
+                "4. Main Findings\n" +
+                "5. Contributions\n" +
+                "6. Limitations\n" +
+                "7. Future Work\n\n" +
+                "Use plain text with clear headings. Do not invent facts not present in the text. " +
                 "If a section is not present in the paper, write \"Not stated in the paper.\"";
 
         List<ChatMessage> messages = List.of(
                 new ChatMessage("system", systemPrompt),
-                new ChatMessage("user", "Paper text:\n" + paperText)
+                new ChatMessage("user", "Paper Context:\n" + paperText)
         );
-        return chat(model, messages, temperature, maxTokens, timeout);
+        return chatStream(model, messages, temperature, maxTokens, timeout, onToken);
+    }
+
+    public String summarize(String paperText, String model, double temperature, int maxTokens, Duration timeout) throws OllamaException {
+        return summarizeStream(paperText, model, temperature, maxTokens, timeout, null);
     }
 
     /**
-     * Extracts structured key-value pairs (abstract, methodology, findings, keywords, topic, contributions, limitations).
+     * Extracts structured info with streaming.
      */
+    public String extractInfoStream(String prompt, String model, double temperature, int maxTokens,
+                                    Duration timeout, Consumer<String> onToken) throws OllamaException {
+        return generateStream(model, prompt, temperature, maxTokens, timeout, onToken);
+    }
+
     public String extractInfo(String paperText, String model, double temperature, int maxTokens, Duration timeout) throws OllamaException {
         String prompt = "Extract from the paper: (1) Abstract (2) Methodology (3) Main Findings " +
                 "(4) Keywords (up to 8) (5) Research Topic (single best category) (6) Contributions (7) Limitations. " +
                 "Return as key: value pairs, one per line.\n\nPaper text:\n" + paperText;
-
         return generate(model, prompt, temperature, maxTokens, timeout);
     }
 
     /**
-     * Context-aware Q&A on paper text.
+     * Context-aware Q&A on paper text with token streaming.
      */
-    public String askQuestion(String paperText, String question, List<ChatMessage> conversationHistory,
-                              String model, double temperature, int maxTokens, Duration timeout) throws OllamaException {
-        String systemPrompt = "You are answering questions about a specific paper. Use only the paper text below as context. " +
-                "If the answer is not in the text, say so. Paper text: <<<" + paperText + ">>>";
+    public String askQuestionStream(String paperText, String question, List<ChatMessage> conversationHistory,
+                                    String model, double temperature, int maxTokens, Duration timeout,
+                                    Consumer<String> onToken) throws OllamaException {
+        String systemPrompt = "You are an expert academic research assistant answering questions about the research paper below. " +
+                "Answer questions thoroughly and accurately based on the provided paper context. " +
+                "If the answer is not in the text, clearly state that it is not covered in the paper. " +
+                "Paper Context: <<<" + paperText + ">>>";
 
         List<ChatMessage> messages = new ArrayList<>();
         messages.add(new ChatMessage("system", systemPrompt));
@@ -253,7 +355,12 @@ public class OllamaService {
         }
         messages.add(new ChatMessage("user", question));
 
-        return chat(model, messages, temperature, maxTokens, timeout);
+        return chatStream(model, messages, temperature, maxTokens, timeout, onToken);
+    }
+
+    public String askQuestion(String paperText, String question, List<ChatMessage> conversationHistory,
+                              String model, double temperature, int maxTokens, Duration timeout) throws OllamaException {
+        return askQuestionStream(paperText, question, conversationHistory, model, temperature, maxTokens, timeout, null);
     }
 
     /**

@@ -43,4 +43,20 @@ public class OllamaServiceTest {
         });
         assertTrue(ex.getMessage().contains("Cannot connect") || ex.getMessage().contains("timed out") || ex.getMessage().contains("Failed"));
     }
+
+    @Test
+    public void testOfflineGenerateStreamThrowsFriendlyException() {
+        OllamaException ex = assertThrows(OllamaException.class, () -> {
+            service.generateStream("llama3.2", "Hello", 0.4, 100, Duration.ofSeconds(1), token -> {});
+        });
+        assertTrue(ex.getMessage().contains("Cannot connect") || ex.getMessage().contains("timed out") || ex.getMessage().contains("Error"));
+    }
+
+    @Test
+    public void testOfflineChatStreamThrowsFriendlyException() {
+        OllamaException ex = assertThrows(OllamaException.class, () -> {
+            service.chatStream("llama3.2", java.util.List.of(), 0.4, 100, Duration.ofSeconds(1), token -> {});
+        });
+        assertTrue(ex.getMessage().contains("Cannot connect") || ex.getMessage().contains("timed out") || ex.getMessage().contains("Error"));
+    }
 }

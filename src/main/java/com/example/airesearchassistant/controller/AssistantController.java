@@ -158,30 +158,39 @@ public class AssistantController {
         AppSettings settings = settingsService.getSettings();
         OllamaService ollama = settingsService.getOllamaService();
 
-        showProgress("Generating 7-section paper summary using " + settings.getDefaultModel() + "...");
+        // Switch to summary tab immediately so user sees incoming tokens
+        if (analysisTabPane != null && summaryTab != null) {
+            analysisTabPane.getSelectionModel().select(summaryTab);
+        }
+        if (summaryTextArea != null) {
+            summaryTextArea.clear();
+        }
+        if (summaryStatusLabel != null) {
+            summaryStatusLabel.setText("Connecting to " + settings.getDefaultModel() + " and streaming summary...");
+        }
+
+        showProgress("Streaming 7-section paper summary using " + settings.getDefaultModel() + "...");
 
         Task<String> task = new Task<>() {
             @Override
             protected String call() throws Exception {
-                return paperService.summarizePaper(
+                return paperService.summarizePaperStream(
                         paper, ollama, settings.getDefaultModel(),
                         settings.getTemperature(), settings.getMaxTokens(),
-                        Duration.ofSeconds(settings.getTimeoutSeconds())
+                        Duration.ofSeconds(settings.getTimeoutSeconds()),
+                        token -> Platform.runLater(() -> {
+                            if (summaryTextArea != null) {
+                                summaryTextArea.appendText(token);
+                            }
+                        })
                 );
             }
         };
 
         task.setOnSucceeded(e -> {
             hideProgress();
-            String summary = task.getValue();
-            if (summaryTextArea != null) {
-                summaryTextArea.setText(summary);
-            }
             if (summaryStatusLabel != null) {
-                summaryStatusLabel.setText("Summary generated successfully. Ready to save.");
-            }
-            if (analysisTabPane != null && summaryTab != null) {
-                analysisTabPane.getSelectionModel().select(summaryTab);
+                summaryStatusLabel.setText("✓ Summary generated successfully via structured JSON context. Ready to save.");
             }
         });
 
@@ -190,7 +199,7 @@ public class AssistantController {
         startAiTask(task);
     }
 
-    // ----- Left Action 2: Extract Information --------------------------------
+    // ----- Left Action 2: Extract Information (Targeted JSON sections with streaming) ----
 
     @FXML
     private void handleExtractInfo() {
@@ -199,30 +208,151 @@ public class AssistantController {
 
         AppSettings settings = settingsService.getSettings();
         OllamaService ollama = settingsService.getOllamaService();
+        String model = settings.getDefaultModel();
+        double temp = settings.getTemperature();
+        int maxTokens = settings.getMaxTokens();
+        Duration timeout = Duration.ofSeconds(settings.getTimeoutSeconds());
 
-        showProgress("Extracting methodology, findings, and metadata using " + settings.getDefaultModel() + "...");
+        // Switch to extracted tab immediately
+        if (analysisTabPane != null && extractedTab != null) {
+            analysisTabPane.getSelectionModel().select(extractedTab);
+        }
 
-        Task<String> task = new Task<>() {
+        // Clear existing fields
+        if (extractedAbstractArea != null) extractedAbstractArea.clear();
+        if (extractedMethodologyArea != null) extractedMethodologyArea.clear();
+        if (extractedFindingsArea != null) extractedFindingsArea.clear();
+        if (extractedKeywordsField != null) extractedKeywordsField.clear();
+        if (extractedTopicField != null) extractedTopicField.clear();
+        if (extractedContributionsArea != null) extractedContributionsArea.clear();
+        if (extractedLimitationsArea != null) extractedLimitationsArea.clear();
+
+        showProgress("Extracting structured info from JSON sections using " + model + "...");
+
+        Task<Void> task = new Task<>() {
             @Override
-            protected String call() throws Exception {
-                return paperService.extractPaperInfo(
-                        paper, ollama, settings.getDefaultModel(),
-                        settings.getTemperature(), settings.getMaxTokens(),
-                        Duration.ofSeconds(settings.getTimeoutSeconds())
-                );
+            protected Void call() throws Exception {
+                // Ensure paper JSON is ready
+                paperService.ensurePaperJson(paper);
+
+                // Step 1: Abstract & Metadata (Keywords, Topic)
+                if (isCancelled()) return null;
+                Platform.runLater(() -> {
+                    if (progressStatusLabel != null) {
+                        progressStatusLabel.setText("Extracting Abstract & Metadata from JSON...");
+                    }
+                    if (extractedStatusLabel != null) {
+                        extractedStatusLabel.setText("Extracting abstract and metadata from JSON...");
+                    }
+                });
+
+                String abstractCtx = (paper.getAbstractText() != null && !paper.getAbstractText().isBlank())
+                        ? paper.getAbstractText()
+                        : paper.getTitle();
+
+                String metaPrompt = "Given this paper title: \"" + paper.getTitle() + "\" and abstract/context:\n" +
+                        abstractCtx + "\n\n" +
+                        "Extract the following 3 items strictly in this format:\n" +
+                        "TOPIC: (single concise research field, e.g. Natural Language Processing, Machine Learning, Computer Vision)\n" +
+                        "KEYWORDS: (up to 8 comma-separated keywords)\n" +
+                        "ABSTRACT:\n(clean, concise abstract paragraph)\n";
+
+                String metaResponse = ollama.generate(model, metaPrompt, temp, maxTokens, timeout);
+                if (isCancelled()) return null;
+                Platform.runLater(() -> parseAndPopulateMetaFields(metaResponse, paper));
+
+                // Step 2: Methodology (using ONLY methodology JSON section)
+                if (isCancelled()) return null;
+                Platform.runLater(() -> {
+                    if (progressStatusLabel != null) {
+                        progressStatusLabel.setText("Streaming Methodology from JSON methodology section...");
+                    }
+                    if (extractedStatusLabel != null) {
+                        extractedStatusLabel.setText("Streaming methodology from JSON...");
+                    }
+                });
+
+                String methContext = paperService.resolveMethodologyContext(paper);
+                String methPrompt = "You are a research analyst. Based strictly on the methodology and approach section below from the research paper, provide a structured summary of the methodology, models/techniques, and experimental setup:\n\n" + methContext;
+                ollama.extractInfoStream(methPrompt, model, temp, maxTokens, timeout, token -> {
+                    Platform.runLater(() -> {
+                        if (extractedMethodologyArea != null) {
+                            extractedMethodologyArea.appendText(token);
+                        }
+                    });
+                });
+
+                // Step 3: Main Findings (using ONLY results/findings JSON section)
+                if (isCancelled()) return null;
+                Platform.runLater(() -> {
+                    if (progressStatusLabel != null) {
+                        progressStatusLabel.setText("Streaming Findings from JSON results section...");
+                    }
+                    if (extractedStatusLabel != null) {
+                        extractedStatusLabel.setText("Streaming main findings from JSON...");
+                    }
+                });
+
+                String findContext = paperService.resolveFindingsContext(paper);
+                String findPrompt = "You are a research analyst. Based strictly on the results and findings section below from the research paper, summarize the main empirical findings, performance results, and key takeaways:\n\n" + findContext;
+                ollama.extractInfoStream(findPrompt, model, temp, maxTokens, timeout, token -> {
+                    Platform.runLater(() -> {
+                        if (extractedFindingsArea != null) {
+                            extractedFindingsArea.appendText(token);
+                        }
+                    });
+                });
+
+                // Step 4: Contributions (using ONLY intro & conclusion JSON sections)
+                if (isCancelled()) return null;
+                Platform.runLater(() -> {
+                    if (progressStatusLabel != null) {
+                        progressStatusLabel.setText("Streaming Contributions from JSON intro & conclusion...");
+                    }
+                    if (extractedStatusLabel != null) {
+                        extractedStatusLabel.setText("Streaming contributions from JSON...");
+                    }
+                });
+
+                String contContext = paperService.resolveContributionsContext(paper);
+                String contPrompt = "You are a research analyst. Based strictly on the introduction and conclusion sections below from the research paper, list the key novel contributions of this research in bullet points:\n\n" + contContext;
+                ollama.extractInfoStream(contPrompt, model, temp, maxTokens, timeout, token -> {
+                    Platform.runLater(() -> {
+                        if (extractedContributionsArea != null) {
+                            extractedContributionsArea.appendText(token);
+                        }
+                    });
+                });
+
+                // Step 5: Limitations (using ONLY discussion & conclusion JSON sections)
+                if (isCancelled()) return null;
+                Platform.runLater(() -> {
+                    if (progressStatusLabel != null) {
+                        progressStatusLabel.setText("Streaming Limitations from JSON discussion & conclusion...");
+                    }
+                    if (extractedStatusLabel != null) {
+                        extractedStatusLabel.setText("Streaming limitations from JSON...");
+                    }
+                });
+
+                String limContext = paperService.resolveLimitationsContext(paper);
+                String limPrompt = "You are a research analyst. Based strictly on the discussion, limitations, and conclusion sections below from the research paper, list the limitations, constraints, assumptions, and threats to validity in bullet points:\n\n" + limContext;
+                ollama.extractInfoStream(limPrompt, model, temp, maxTokens, timeout, token -> {
+                    Platform.runLater(() -> {
+                        if (extractedLimitationsArea != null) {
+                            extractedLimitationsArea.appendText(token);
+                        }
+                    });
+                });
+
+                return null;
             }
         };
 
         task.setOnSucceeded(e -> {
             hideProgress();
-            String rawExtraction = task.getValue();
-            parseAndPopulateExtractedFields(rawExtraction);
-
             if (extractedStatusLabel != null) {
-                extractedStatusLabel.setText("Information extracted. You can review/edit before saving.");
-            }
-            if (analysisTabPane != null && extractedTab != null) {
-                analysisTabPane.getSelectionModel().select(extractedTab);
+                extractedStatusLabel.setText("✓ All fields extracted from targeted JSON sections. Ready to save.");
             }
         });
 
@@ -231,67 +361,52 @@ public class AssistantController {
         startAiTask(task);
     }
 
-    private void parseAndPopulateExtractedFields(String text) {
-        if (text == null) return;
-        String[] lines = text.split("\\r?\\n");
+    private void parseAndPopulateMetaFields(String text, ResearchPaper paper) {
+        if (text == null || text.isBlank()) {
+            if (paper.getAbstractText() != null && extractedAbstractArea != null) {
+                extractedAbstractArea.setText(paper.getAbstractText());
+            }
+            if (paper.getTopic() != null && extractedTopicField != null) {
+                extractedTopicField.setText(paper.getTopic());
+            }
+            if (paper.getKeywords() != null && extractedKeywordsField != null) {
+                extractedKeywordsField.setText(paper.getKeywords());
+            }
+            return;
+        }
 
-        StringBuilder currentSection = new StringBuilder();
-        String currentKey = "";
+        String[] lines = text.split("\\r?\\n");
+        StringBuilder abstractBuilder = new StringBuilder();
+        boolean inAbstract = false;
 
         for (String line : lines) {
-            String lower = line.toLowerCase().trim();
-            if (lower.startsWith("abstract:") || lower.startsWith("(1) abstract:")) {
-                saveCurrentSection(currentKey, currentSection.toString());
-                currentKey = "abstract";
-                currentSection = new StringBuilder(line.substring(line.indexOf(":") + 1).trim());
-            } else if (lower.startsWith("methodology:") || lower.startsWith("(2) methodology:")) {
-                saveCurrentSection(currentKey, currentSection.toString());
-                currentKey = "methodology";
-                currentSection = new StringBuilder(line.substring(line.indexOf(":") + 1).trim());
-            } else if (lower.startsWith("main findings:") || lower.startsWith("findings:") || lower.startsWith("(3) main findings:")) {
-                saveCurrentSection(currentKey, currentSection.toString());
-                currentKey = "findings";
-                currentSection = new StringBuilder(line.substring(line.indexOf(":") + 1).trim());
-            } else if (lower.startsWith("keywords:") || lower.startsWith("(4) keywords:")) {
-                saveCurrentSection(currentKey, currentSection.toString());
-                currentKey = "keywords";
-                currentSection = new StringBuilder(line.substring(line.indexOf(":") + 1).trim());
-            } else if (lower.startsWith("research topic:") || lower.startsWith("topic:") || lower.startsWith("(5) research topic:")) {
-                saveCurrentSection(currentKey, currentSection.toString());
-                currentKey = "topic";
-                currentSection = new StringBuilder(line.substring(line.indexOf(":") + 1).trim());
-            } else if (lower.startsWith("contributions:") || lower.startsWith("(6) contributions:")) {
-                saveCurrentSection(currentKey, currentSection.toString());
-                currentKey = "contributions";
-                currentSection = new StringBuilder(line.substring(line.indexOf(":") + 1).trim());
-            } else if (lower.startsWith("limitations:") || lower.startsWith("(7) limitations:")) {
-                saveCurrentSection(currentKey, currentSection.toString());
-                currentKey = "limitations";
-                currentSection = new StringBuilder(line.substring(line.indexOf(":") + 1).trim());
-            } else {
-                if (!currentKey.isEmpty()) {
-                    currentSection.append("\n").append(line);
+            String trimmed = line.trim();
+            String lower = trimmed.toLowerCase();
+            if (lower.startsWith("topic:")) {
+                String topic = trimmed.substring(6).trim();
+                if (extractedTopicField != null && !topic.isEmpty()) {
+                    extractedTopicField.setText(topic);
                 }
+            } else if (lower.startsWith("keywords:")) {
+                String kw = trimmed.substring(9).trim();
+                if (extractedKeywordsField != null && !kw.isEmpty()) {
+                    extractedKeywordsField.setText(kw);
+                }
+            } else if (lower.startsWith("abstract:")) {
+                inAbstract = true;
+                String rest = trimmed.substring(9).trim();
+                if (!rest.isEmpty()) abstractBuilder.append(rest).append("\n");
+            } else if (inAbstract) {
+                abstractBuilder.append(line).append("\n");
             }
         }
-        saveCurrentSection(currentKey, currentSection.toString());
 
-        // If no sections recognized, populate raw in methodology area
-        if (currentKey.isEmpty() && extractedMethodologyArea != null) {
-            extractedMethodologyArea.setText(text);
-        }
-    }
-
-    private void saveCurrentSection(String key, String content) {
-        String val = content.trim();
-        switch (key) {
-            case "abstract" -> { if (extractedAbstractArea != null) extractedAbstractArea.setText(val); }
-            case "methodology" -> { if (extractedMethodologyArea != null) extractedMethodologyArea.setText(val); }
-            case "findings" -> { if (extractedFindingsArea != null) extractedFindingsArea.setText(val); }
-            case "keywords" -> { if (extractedKeywordsField != null) extractedKeywordsField.setText(val); }
-            case "topic" -> { if (extractedTopicField != null) extractedTopicField.setText(val); }
-            case "contributions" -> { if (extractedContributionsArea != null) extractedContributionsArea.setText(val); }
-            case "limitations" -> { if (extractedLimitationsArea != null) extractedLimitationsArea.setText(val); }
+        if (extractedAbstractArea != null) {
+            String finalAbstract = abstractBuilder.toString().trim();
+            if (finalAbstract.isEmpty() && paper.getAbstractText() != null) {
+                finalAbstract = paper.getAbstractText();
+            }
+            extractedAbstractArea.setText(finalAbstract);
         }
     }
 
@@ -424,13 +539,29 @@ public class AssistantController {
 
         showProgress("Consulting Ollama (" + settings.getDefaultModel() + ")...");
 
+        // Add assistant placeholder for streaming
+        int assistantIndex = chatHistory.size();
+        chatHistory.add("Assistant: ");
+        if (chatListView != null) {
+            chatListView.scrollTo(assistantIndex);
+        }
+
         Task<String> task = new Task<>() {
             @Override
             protected String call() throws Exception {
-                return paperService.askPaperQuestion(
+                return paperService.askPaperQuestionStream(
                         paper, question, conversationMessages, ollama,
                         settings.getDefaultModel(), settings.getTemperature(), settings.getMaxTokens(),
-                        Duration.ofSeconds(settings.getTimeoutSeconds())
+                        Duration.ofSeconds(settings.getTimeoutSeconds()),
+                        token -> Platform.runLater(() -> {
+                            if (assistantIndex < chatHistory.size()) {
+                                String current = chatHistory.get(assistantIndex);
+                                chatHistory.set(assistantIndex, current + token);
+                                if (chatListView != null) {
+                                    chatListView.scrollTo(assistantIndex);
+                                }
+                            }
+                        })
                 );
             }
         };
@@ -438,7 +569,6 @@ public class AssistantController {
         task.setOnSucceeded(e -> {
             hideProgress();
             String answer = task.getValue();
-            chatHistory.add("Assistant: " + answer);
             conversationMessages.add(new ChatMessage("user", question));
             conversationMessages.add(new ChatMessage("assistant", answer));
             if (chatListView != null) {
